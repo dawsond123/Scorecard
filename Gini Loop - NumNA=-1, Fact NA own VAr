@@ -1,0 +1,111 @@
+#tidyx<-x
+
+x<-tidyx[1:100000,]
+temp<-x
+
+x[x==9999999] <- NA
+
+x$PDB<-as.factor(x$PDB)
+x$URB<-as.factor(x$URB)
+x$VRB<-as.factor(x$VRB)
+x$WRB<-as.factor(x$WRB)
+
+# changeNA<- function(x) {
+#   if( class(x) == "numeric" || class(x) == "integer" ) {
+#     x[is.na(x)] <- -1
+#   } else (x <- x)
+# }
+# 
+# x<-apply(x,changeNA)
+# x<-data.frame(x)
+
+x$tjc<-NULL
+x$xkc<-NULL
+# # 
+# x$HYB<-NULL
+# x$RYB<-NULL
+# x$NJC<-NULL
+# x$HRB<-NULL
+# x$SYB<-NULL
+# x$FWB<-NULL
+ x$KCB<-NULL
+x$WAC<-NULL
+x$JBC<-NULL
+x$BTB<-NULL
+x$ICB<-NULL
+x$ZE<-NULL
+
+#temp<-x
+# x<-temp
+
+x<-lapply(x,function(y) {if (is.factor(y)==TRUE) {addNA(y)}else{y<-y} })
+x<-data.frame(x)
+
+x<-x[,sapply(x,isUnique)]
+
+x<-mutate_if(x,is.numeric, funs(replace(., is.na(.), -1)))
+x<-mutate_if(x,is.integer, funs(replace(., is.na(.), -1)))
+
+
+x["testV"] <- temp$testV   #add a column for test varibale
+x["testV6"] <- temp$testV6   #add a column for test varibale
+
+
+x2<-x
+x6<-x
+x2$testV6<-NULL
+x6$testV<-NULL
+
+y2<-x2[((0.6*length(x[,1]))+1):(length(x[,1])),]
+x2<-x2[1:(0.6*length(x[,1])) ,]
+y6<-x6[((0.6*length(x[,1]))+1):(length(x[,1])),]
+x6<-x6[1:(0.6*length(x[,1])) ,]
+
+
+Gin2<-vector(mode="double",length=length(x[1,])-1)
+Gin6<-vector(mode="double",length=length(x[1,])-1)
+
+#varList<-lapply(x,is.factor)
+
+varList<-sapply(x[,1:length(x[1,])],names)
+
+for(i in 1:(length(x[1,])-2) )   { 
+  t<-NA 
+  t1<-NA
+  temp<-NA
+  temp1<-NA
+  fit<-NA
+  fit1<-NA
+  
+  
+  Formula <- formula(paste("testV ~ ",  (names(varList[i]))))
+  Formula2 <- formula(paste("testV6 ~ ",  (names(varList[i]))))
+  
+  fit <- glm(Formula , family="binomial", data=x2, na.action=na.omit)
+  fit1 <- glm( Formula2 , family="binomial", data=x6, na.action=na.omit) 
+  
+  
+  t<-predict(fit, y2, type="response")
+  t1<-predict(fit1, y6, type="response")
+  
+  temp<-data.frame(y2$testV,t)
+  
+  temp1<-data.frame(y6$testV6,t1)
+  
+  
+  Gin2[i] <- 2*AUROC( temp$y2.testV,temp$t) - 1
+  Gin6[i] <- 2*AUROC( temp1$y6.testV6,temp1$t1)  - 1
+  
+  print(i)
+}
+
+z<-colnames(x[1,1:(length(x[1,])-1)]) # create vector of variable names
+VariableComp2<-data.frame(z,Gin2,Gin6) 
+rm(Gin2,Gin6,varList,fit,fit1,z,t,t1,temp,temp1,x2,x6,y2,y6,Formula,Formula2)
+
+write.csv(VariableComp2,file="GiniScores.csv")
+
+
+
+plotROC(y$testV6,y$predicted)
+2*AUROC(y$testV6,y$predicted)-1
