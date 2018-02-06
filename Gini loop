@@ -1,0 +1,206 @@
+#tidyx<-x
+
+x<-data_2_6_untouched
+x$X.1<-NULL
+
+# -999997 = Not Derivable -99999 = out of bounds
+x[x==-999997] <- NA
+x[x==-999999] <- NA
+
+#Change A and U to 9 and 10
+x[,678:715][x[,678:715]=="A"] <- 9 
+x[,678:715][x[,678:715]=="U"] <- 0
+
+x$OD<-NULL  #date format - other variables describve same thing better 
+# 
+# x["testV"] <- NA   #add a column for test varibale
+# x["testV6"] <- NA   #add a column for test varibale
+# 
+# 
+# # Find any status greater than 2 - testV=1 if account has gone 2+ over the 2 years
+# for (i in 1:length(x[,1])){ #through rows
+#   sum=0
+#   sum1=0
+#   for (j in 678:715) { #through cols
+#     if (x[i,j]  > 2 && !is.na(x[i,j])) {
+#       sum = sum + 1 } else {sum = sum}
+#     
+#     if (x[i,j]  > 5 && !is.na(x[i,j])) {
+#       sum1 = sum1 + 1 } else {sum1 = sum1}
+#     
+#     
+#     
+#     if (sum > 0) {
+#       x$testV[i] <- 1
+#     } else { x$testV[i] <- 0}
+#     
+#     if (sum1 > 0) {
+#       x$testV6[i] <- 1
+#     } else { x$testV6[i] <- 0}
+#   }
+# }
+# remove performance data, start date, type of account and id number
+ x[, 563:(length(x[1,])-2)]<-NULL
+ x[, 1:3] <-NULL
+
+
+
+x[x=="ND"] <- NA
+x[x=="<NA>"] <- NA
+
+
+#Columns with only one unique value are removed
+isUnique<-function(x){
+  length(unique(x))!=1   
+}
+x<-x[,sapply(x,isUnique)]
+
+
+
+# numerics stored as characters are converted
+x$PDB<-as.factor(x$PDB)     # over 25 unique but with "XXX >> stored as factor
+x$BTB<-as.factor(x$BTB)
+x$HCB<-as.factor(x$HCB)
+ConvToNum <- function(x) {
+  if (class(x) == "character"  && length(unique(x)) > 25 && !is.na(length(unique(x)))) {
+    x[x=="NA"]<-NA
+    x[x=="ND"]<-NA
+    x<-as.numeric(x)
+  } else { x <- x }
+}
+x<-suppressWarnings(lapply(x,ConvToNum))
+x<-data.frame(x)
+
+
+x$PDB<-as.character(x$PDB)
+x$PDB[x$PDB=="XX"] <- NA
+x$PDB<-as.numeric(x$PDB)
+
+x$TRB<-as.character(x$TRB)
+x$TRB[x$TRB=="XX"] <- NA
+x$TRB<-as.factor(x$TRB)
+
+x$TCB<-as.character(x$TCB)
+x$TCB[x$TCB=="NA"] <- NA
+x$TCB<-as.numeric(x$TCB)
+
+x$DDB<-as.character(x$DDB)
+x$DDB[x$DDB=="NA"] <- NA
+x$DDB<-as.numeric(x$DDB)
+
+x$WRB<-as.character(x$WRB)
+x$WRB[x$WRB=="NA"] <- NA
+x$WRB[x$WRB=="X"] <- NA
+x$WRB<-as.numeric(x$WRB)
+
+x$VRB<-as.character(x$VRB)
+x$VRB[x$VRB=="<NA>"] <- NA
+x$VRB[x$VRB=="X"] <- NA
+x$VRB<-as.numeric(x$VRB)
+
+x$URB<-as.character(x$URB)
+x$URB[x$URB=="<NA>"] <- NA
+x$URB[x$URB=="X"] <- NA
+x$URB<-as.numeric(x$URB)
+
+
+#### Tidy working set -  Gini loop below ####
+
+
+
+
+
+x<-tidyx[1:100000,]
+
+x[x==9999999] <- NA
+
+x$PDB<-as.factor(x$PDB)
+x$URB<-as.factor(x$URB)
+x$VRB<-as.factor(x$VRB)
+x$WRB<-as.factor(x$WRB)
+
+changeNA<- function(x) {
+  if( class(x) == "numeric" || class(x) == "integer" ) {
+    x[is.na(x)] <- -1
+  } else (x <- x)
+}
+
+x<-apply(x,changeNA)
+x<-data.frame(x)
+
+x$tjc<-NULL
+x$xkc<-NULL
+# 
+# x$HYB<-NULL
+# x$RYB<-NULL
+x$ICB<-NULL
+# x$NJC<-NULL
+# x$HRB<-NULL
+# x$SYB<-NULL
+x$FWB<-NULL
+x$KCB<-NULL
+x$WAC<-NULL
+x$JBC<-NULL
+x$BTB<-NULL
+
+
+x<-x[,sapply(x,isUnique)]
+x<-x[,sapply(x,isUnique2)]
+
+x2<-x
+x6<-x
+x2$testV6<-NULL
+x6$testV<-NULL
+
+y2<-x2[((0.6*length(x[,1]))+1):(length(x[,1])),]
+x2<-x2[1:(0.6*length(x[,1])) ,]
+y6<-x6[((0.6*length(x[,1]))+1):(length(x[,1])),]
+x6<-x6[1:(0.6*length(x[,1])) ,]
+
+
+Gin2<-vector(mode="double",length=length(x[1,])-1)
+Gin6<-vector(mode="double",length=length(x[1,])-1)
+
+
+varList<-sapply(x[,1:length(x[1,])],names)
+
+for(i in 1:(length(x[1,])-2) )   { 
+  #for ( i in 1:150) {
+  t<-NA 
+  t1<-NA
+  temp<-NA
+  temp1<-NA
+  fit<-NA
+  fit1<-NA
+  
+  
+  Formula <- formula(paste("testV ~ ",  (names(varList[i]))))
+  Formula2 <- formula(paste("testV6 ~ ",  (names(varList[i]))))
+  
+  # fit <- glm(Formula , family="binomial", data=x2, na.action=na.omit)
+  # fit1 <- glm( Formula2 , family="binomial", data=x6, na.action=na.omit) 
+  fit <- lrm(Formula , data=x2)
+  fit1 <- lrm( Formula2 , data=x6) 
+  
+  t<-predict(fit, y2, type="fitted")
+  t1<-predict(fit1, y6, type="fitted")
+  
+  temp<-data.frame(y2$testV,t)
+  
+  temp1<-data.frame(y6$testV6,t1)
+  
+  
+  Gin2[i] <- 2*AUROC( temp$y2.testV,temp$t) - 1
+  Gin6[i] <- 2*AUROC( temp1$y6.testV6,temp1$t1)  - 1
+  
+  print(i)
+}
+
+z<-colnames(x[1,1:(length(x[1,])-1)]) # create vector of variable names
+VariableComp2<-data.frame(z,Gin2,Gin6) 
+rm(Gin2,Gin6,varList,fit,fit1,z,t,t1,temp,temp1,x2,x6,y2,y6,Formula,Formula2)
+
+write.csv(VariableComp2,file="GiniScores")
+
+
+
