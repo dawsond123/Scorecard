@@ -1,0 +1,201 @@
+x<-tidyx
+### MODEL EVALUATION ###
+
+
+
+
+# fit1 <- glm(x$testV ~ SUB + XR + IRB + NJC + UM + VBC +SDB +UBC + SM + ZZB +TM +TRB + TG + JH + UR+  GI+ YUB+ XUB+ UUB + TUB + PDB + MOB + OOB + QIC + NCB + MCB + IG+SEB+TEB+FDB+ET+GDB+CT+HVB+SMB, family="binomial",data=x, na.action=na.omit) 
+fit <- glm(x$testV ~	+XCB	+XL	+FDB	+ET	+GDB	+REB	+SO	+OIC	+UEB	+ADB	+CT	+SVB	+SCB	+KWB	+LWB	+BDB	+PCB	+HWB	+JWB	+OCB	+PIC	+QEB	+USB	+ZCB	+PR	+FZB	+GVB	+HVB	+TCB	+CDB	+PTB	+OR	+SMB	+RSB	+QTB	+QSB	+TSB	+ODB	+SSB	+DZB	+PSB	+CZB	+OSB	+ESB	+DSB	+NDB	+ZWB	+LCB	+HSB	+RVB	+UF	+AG	+NSB	+VCB	+MSB	+LSB	+ZR	+UCB	+IWB	+KDB	+GCB	+GWB	+JSB	+ISB	+KSB	+DDB	+NIC	+WCB	+ITB	+MWB	+WHC	+YGC	+YWB	+UTB	+DWB	+BWB	+CSB	+STB	+TTB	+RTB	+ZHC	+EUB	+UDB	+MEB	+MTB	+PL	+NEB	+OAC	+HQ	+EF	+DTB	+OTB	+ETB	+FD	+IQ	+MF	+LIC	+PWB	+AAC	+YVB	+DB	+NTB	+LEB	+VVB	+CWB	+HUB	+KVB	+IT	+BB	+GD	+ZTB	+DUB	+LUB	+OE	+LVB	+JTB	+WUB	+YR	+OUB	+BZB	+VUB	+KTB	+WTB	+SP	+YTB	+DVB	+IVB	+EVB	+AUB	+VTB	+CVB	+XTB	+EWB	+LTB	+XWB	+QUB	+NUB	+PUB	+IUB	+UG	+ZVB	+MUB	+JVB	+AWB	+MVB	+JUB	+KUB	+BUB	+FUB	+GUB	+NWB	+GTB	+LD	+OWB	+HTB	+AVB	+PVB	+FVB	+ZUB	+FT	+Z	+LE	+QT	+RUB	+VG	+WWB	+TP	+KEB	+RP	+BIC	+PT	+MQB	+CIC	+KE	+RMB	+DT	+QP	+JJC	+ZG	+DIC	+FB	+HG	+ME	+XMB	+FQB	+WG	+AH	+VD	+BH	+NF	+XG	+LJC	+LQB	+CH	+TT	+PF	+XHC	+PP	+TF	+ZF	+FYB	+WQB	+HIC	+DAB	+OL	+ZH	+VP	+EB	+FG	+ZS	+AI	+VSB	+WGB	+MR	+UP	+ZAC	+CAB	+GF	+UL	+SF	+YF	+NMB	+OMB	+BT	+GT	+KD	+CB	+ID	+DJC	+AB	+AT	+JE	+PD	+NQB	+OF	+GYB	+AD	+IE	+QD	+GQB	+BI	+VGB	+UPB	+TD	+SD	+KRB	+W	+BTB	+DAB	+GCB		+FWB	+KCB	+URB	+MOB	+VRB	+NOB	+OOB	+WRB	+CSB	+DSB	+ESB	+FSB	+GSB	+HSB	+LCB	+MCB	+NCB	+OCB	+PCB	+DDB	+EDB	+FDB	+GDB	+QCB	+RCB	+XCB	+YCB	+SCB	+TCB	+UCB	+VCB	+WCB	+ZCB	+ADB	+BDB	+CDB	+HDB	+IDB	+HWB	+IWB	+JWB	+KWB	+LWB	+JDB	+KDB	+MDB	+NDB	+ODB	+ISB	+GWB	+JSB	+KSB	+LSB	+MSB	+NSB	+OSB	+PSB	+QSB	+RSB	+SSB	+TSB	+USB	+PDB	+UDB	+KEB	+LEB	+MEB	+NEB	+YGC	+QEB	+REB	+SEB	+TEB	+UEB	+RFB	+DJC	+NIC	+OIC	+PIC	+QIC	+VGB	+WGB	+ZAC	+VSB	+BTB	+CTB	+DTB	+ETB	+FTB	+NWB	+GTB	+OWB	+HTB	+PWB	+ITB	+MWB	+JTB	+KTB	+LTB	+MTB	+NTB	, family="binomial",data=x, na.action=na.omit)
+
+
+# GOODeach iteration better than last#
+# fit1 <- glm(x$testV ~  SUB + tjc	+TN	+TMB	+XR	+IRB	+SYB	+OJC	+SN	+ NJC	+MG	+LG	+NG	+HRB	+OG	+RDB	+SPB	+UM	+VBC	+SDB	+BQ	+WMB	+CQ	+UBC	+JG	+SM	+GRB	+ZZB	+DQ	+NOB	+WBC	+TM	+XBC	+YBC	+EQ	+FRB	+GB	+GG	+YQB	+RN	+TRB	+JRB	+TG	+RG	+JH	+EDB	+ZQB	+MDB	+JDB	+TPB	+FTB	+VR	+QL	+UR	+CG	+LRB	+UVB	+GH	+FI	+MHC	+EI	+GI	+QVB	+OVB	+YUB	+URB	+KCB	+XUB	+UUB	+UH	+ST	+TUB	+VH	+PDB	+VRB	+PH	+HDB	+MOB	+XVB	+IDB	+QH	+RH	+WH	+RCB	+QCB	+WRB	+OOB	+RT	+TVB	+QIC	+GSB	+EJ	+NCB	+FSB	+MCB	+IG	+SEB	+FJ	+QO	+WVB	+TEB	+YCB	+XCB	+XL	+FDB	+ET	+GDB	+REB	+SO	+OIC	+UEB	+ADB	+CT	+SVB	+SCB	+KWB	+LWB	+BDB	+PCB	+HWB	+JWB	+OCB	+PIC	+QEB	+USB	+ZCB	+PR	+FZB	+GVB	+HVB	+TCB	+CDB	+PTB	+OR	+SMB	+RSB	+QTB	+QSB	+TSB	+ODB	+SSB	+DZB	+PSB	+CZB	+OSB	+ESB	+DSB	+NDB	+ZWB	+LCB	+HSB	+RVB	+UF	+AG	+NSB	+VCB	+MSB	+LSB	+ZR	+UCB	+IWB	+KDB	+GWB	+JSB	+ISB	+KSB	+DDB	+NIC	+WCB	+ITB	+MWB	+WHC	+YGC	+YWB	+UTB	+DWB	+BWB	+CSB	+STB	+TTB	+RTB	+ZHC	+EUB	+UDB	+MEB	+MTB	+PL	+NEB	+OAC	+HQ	+EF	+DTB	+OTB	+ETB	+FD	+IQ	+MF	+LIC	+PWB	+AAC	+YVB	+DB	+NTB	+LEB	+VVB	+CWB	+HUB	+KVB	+IT	+BB	+GD	+ZTB	+DUB	+LUB	+OE	+LVB	+JTB	+WUB	+YR	+OUB	+BZB	+VUB	+KTB	+WTB	+SP	+YTB	+DVB	+IVB	+EVB	+AUB	+VTB	+CVB	+XTB	+EWB	+LTB  +XWB	+QUB	+NUB	+PUB	+IUB	+UG	+ZVB	+MUB	+JVB	+AWB	+MVB	+JUB	+KUB	+BUB	+FUB	+GUB	+NWB	+GTB	+LD	+OWB	+HTB	+AVB	+PVB	+FVB	+ZUB	+FT	+Z	+LE	+QT	+RUB	+VG	+WWB	+TP	+KEB	+RP	+BIC	+PT	+MQB	+CIC	+KE	+RMB	+DT	+QP	+JJC	+ZG	+DIC	+FB	+HG	+ME	+XMB	+FQB	+WG	+AH	+VD	+BH	+NF	+XG	+LJC  +LQB	+CH	+TT	+PF	+XHC	+PP	+TF	+ZF	+FYB	+WQB	+HIC	+DAB	+OL	+ZH	+VP	+EB	+FG	+ZS	+AI	+VSB	+WGB	+MR	+UP	+ZAC	+CAB	+GF	+UL	+SF	+YF	+NMB	+OMB	+BT+GT	+KD	+CB	+ID	+DJC	+AB	+AT	+JE	+PD	+NQB	+OF	+GYB	+AD	+IE	+QD	+GQB	+BI	+VGB	+UPB	+TD	+SD	+KRB	+W	+BTB	+DAB	+HCB	+TRB	+KCB	+URB	+MOB	+VRB	+NOB	+OOB	+WRB	+CSB	+DSB	+ESB	+FSB	+GSB	+HSB	+LCB	+MCB	+NCB	+OCB	+PCB	+DDB	+EDB	+FDB	+GDB	+QCB	+RCB	+XCB	+YCB, family="binomial",data=x, na.action=na.omit)
+#fit1 <- glm(x$testV ~  SUB + XR + IRB + NJC + UM + VBC + SDB +UBC + SM + ZZB +TM +TRB + TG + JH + UR+  GI+ YUB + XUB+ UUB + MOB + QIC + IG + SEB + TEB + FDB + ET + CT + HVB + SMB, family="binomial",data=x, na.action=na.omit) 
+fit1 <- glm(x$testV ~ IRB  + UM  + SDB + SM + ZZB +TM + TRB  + JH +  GI + YUB + UUB + QIC + IG + SEB + TEB + FDB + ET  + HVB + SMB, family="binomial",data=x, na.action=na.omit) 
+
+
+#fit2 <- glm(x$testV ~ +XCB	+XL	+FDB	+ET	+GDB	+REB	+SO	+OIC	+UEB	+ADB	+CT	+SVB	+SCB	+KWB	+LWB	+BDB	+PCB	+HWB	+JWB	+OCB	+PIC	+QEB	+USB	+ZCB	+PR	+FZB	+GVB	+HVB	+TCB	+CDB	+PTB	+OR	+SMB	+RSB	+QTB	+QSB	+TSB	+ODB	+SSB	+DZB	+PSB	+CZB	+OSB	+ESB	+DSB	+NDB	+ZWB  +LCB	+HSB	+RVB	+UF	+AG	+NSB	+VCB	+MSB	+LSB	+ZR	+UCB	+IWB	+KDB	+GCB	+GWB	+JSB	+ISB	+KSB	+DDB	+NIC	+WCB	+ITB	+MWB	+WHC	+YGC  +YWB	+UTB	+DWB	+BWB	+CSB	+STB	+TTB	+RTB	+ZHC	+EUB	+UDB	+MEB	+MTB	+PL	+NEB	+OAC	+HQ	+EF	+DTB	+OTB	+ETB	+FD	+IQ	+MF	+LIC	+PWB	+AAC	+YVB	+DB	+NTB	+LEB	+VVB	+CWB	+HUB	+KVB	+IT	+BB	+GD	+ZTB	+DUB	+LUB	+OE	+LVB	+JTB	+WUB	+YR	+OUB	+BZB	+VUB	+KTB	+WTB	+SP +YTB	+DVB	+IVB	+EVB	+AUB	+VTB	+CVB	+XTB	+EWB	+LTB	+XWB	+QUB	+NUB	+PUB	+IUB	+UG	+ZVB	+MUB	+JVB	+AWB	+MVB	+JUB	+KUB	+BUB  +FUB	+GUB	+NWB	+GTB	+LD	+OWB	+HTB	+AVB	+PVB	+FVB	+ZUB	+FT	+Z	+LE	+QT	+RUB	+VG	+WWB	+TP	+KEB	+RP	+BIC	+PT	+MQB	+CIC	+KE	+RMB	+DT	+QP	+JJC	+ZG	+DIC	+FB	+HG	+ME	+XMB	+FQB	+WG	+AH	+VD	+BH	+NF	+XG	+LJC	+LQB	+CH	+TT	+PF	+XHC	+PP	+TF	+ZF	+FYB	+WQB	+HIC	+DAB	+OL	+ZH	+VP	+EB	+FG	+ZS	+AI	+VSB	+WGB	+MR	+UP	+ZAC	+CAB	+GF	+UL	+SF	+YF	+NMB	+OMB	+BT	+GT	+KD	+CB	+ID +DJC + AB +AT +JE +PD +NQB  +OF + GYB +AD +IE + QD	+GQB	+BI	+VGB	+UPB	+TD	+SD	+KRB +W	+BTB	+DAB	+GCB 	+ESB +GSB + LCB + NCB + PCB+ GDB + RCB + YCB	, family="binomial",data=x, na.action=na.omit)
+fit2 <- glm(x$testV ~  XL + SO + OIC + UEB + SVB + SCB + PCB +OCB + ZCB + GVB + HVB + OR + SMB + DZB + RVB + ZR + +NIC + WHC + YGC + UTB + DWB + CSB + ZHC + UDB + PL + NEB + HQ + EF + FD + MF+ AAC + YVB + DB + CWB + KVB + IT + ZTB + LUB + OE + YR + DVB + EWB + QUB + UG + ZVB + MUB + MVB + PVB + LE + QT + RUB + VG + WWB + RP +  PT + MQB + CIC + KE + QP, family="binomial",data=x, na.action=na.omit) 
+
+#fit3<-  glm(x$testV ~	+SCB	+TCB	+UCB	+VCB	+WCB	+ZCB	+ADB	+BDB	+CDB	+HDB	+IDB	+HWB	+IWB	+JWB	+KWB	+LWB	+JDB	+KDB	+MDB	+NDB	+ODB	+ISB	+GWB	+JSB	+KSB	+LSB	+MSB	+NSB	+OSB	+PSB	+QSB	+RSB	+SSB	+TSB	+USB	+PDB	+UDB	+KEB	+LEB	+MEB	+NEB	+YGC	+QEB	+REB	+SEB	+TEB	+UEB	+RFB	+DJC	+NIC	+OIC	+PIC	+QIC	+VGB	+WGB	+ZAC	+VSB	+BTB	+CTB	+DTB	+ETB	+FTB	+NWB	+GTB	+OWB	+HTB	+PWB	+ITB	+MWB	+JTB	+KTB	+LTB	+MTB	+NTB	+OTB	+PTB	+QTB	+RTB	+STB	+TTB	+UTB	+VTB	+WTB	+XTB	+YTB	+ZTB	+AVB	+CVB	+DVB	+EVB	+FVB	+GVB	+HVB	+IVB	+JVB	+KVB	+LVB	+MVB		+OVB	+PVB	+QVB	+RVB	 , family="binomial",data=x, na.action=na.omit)
+fit3<-  glm(x$testV ~	SCB + UCB + VCB + JDB + UDB + NEB + YGC + SEB + UEB + DJC + NIC + QIC + VGB + BTB + MTB + NTB + OTB + PTB+ QTB + RTB	 , family="binomial",data=x, na.action=na.omit)
+
+#fit4<-  glm(x$testV ~AUB	+DUB	+EUB	+FUB	+GUB	+HUB	+IUB	+JUB	+LUB	+MUB	+NUB	+OUB	+PUB	+QUB	+SUB	+TUB	+UUB	+VUB	+WUB	+XUB	+YUB	+ZUB+SVB	+TVB	+UVB	+VVB	+WVB	+XVB	+YVB	+ZVB	+AWB	+BWB	+CWB	+DWB	+EWB	+FQB	+HQB	+IQB	+AYB	+BYB	+CYB	+DYB	+EYB	+IYB	+JYB	+KYB	+LYB	+WHC	+PYB	+QYB	+UYB	+VYB	+ZYB	+AZB	+EZB	+IZB, family="binomial",data=x, na.action=na.omit)
+#fit5<-  glm(x$testV ~ W+	X+	Z + AB +	BB +	CB +	DB +	EB +	FB +	GB +	HB +	IB +	UPB+	AD+	LQB+	MQB+	LJC+		FD+	GD+	HD+	ID+	JD+	TQB+	KD+	LD+	MD+	ND+	PD+	QD+	SD+	TD+VD+	WD+	XD+	YD+	ZD+	AE+	BE+	CE+	IE+	JE+	KE+	LE+	ME+	NE+	OE+		QE+		XE+	YE, family="binomial",data=x, na.action=na.omit)
+#fit4+fit5=fit4
+fit4<-  glm(x$testV ~ DUB + EUB + FUB + GUB + HUB + IUB +JUB + TUB + UUB + XUB + YUB + ZUB + VVB + AWB + DWB + IQB + CYB + LYB + AZB + IZB + CB +GB + JD + MD + ZD+BE, family="binomial",data=x, na.action=na.omit)
+
+#fit6<-  glm(x$testV ~ FG+	GG+	HG+	IG+	JG+	KG+	LG+	MG+	NG+	OG+	SPB+	RDB+	PG+	RG+	TG+	UG+	VG+	WG+	XG+	ZG+	AH+	BH+	CH+	GH+	HH+	JH+	SDB+	KH+	LH+	MH+	ARB+	CRB+	DRB+	TDB+	RRB+	PH+	QH, family="binomial",data=x, na.action=na.omit)
+#fit7<-  glm(x$testV ~ RH +ZH+ EJ + QL + XL + EM + MHC + YZB +UM +XZB, family="binomial",data=x, na.action=na.omit)
+#fit6=fit7+fit6
+fit5<-  glm(x$testV ~ VG + KH + DRB + LG+	MG + TDB + RRB + PH + QH + MH + HH+RH +ZH+ EJ + QL + XL + EM + MHC + YZB +UM +XZB, family="binomial",data=x, na.action=na.omit)
+
+#fit8<-  glm(x$testV ~ VM+	WM+	XM+	MRB+	POB+	ZM+	AN+	BN+	HN+	IN+	JN+	KN+	MN+	NN+	ON+	PN+	QN+	SJC+	RN+	SN+	TN+	UN+	WN+	XN+	YN+	QO+	SO+	FRB+	BQ, family="binomial",data=x, na.action=na.omit)
+#fit9<-  glm(x$testV ~  BQ+	CQ+	DQ+	EQ+	GRB+	IRB+	NJC+	OJC+	HQ+	IQ+	BRB+	JQ+	KQ+	NQ+	OQ+	PQ+	NMB+	OMB+	RMB+	SMB+	TMB+	WMB+	RUB+	XMB+	DG+	EG+	JRB+	KRB+	HRB+	LRB+	YQB+	ZQB+	FYB+	GYB+	HYB+	MYB+	NYB+	OYB+	RYB+	SYB+	TYB+	WYB+	XYB+	YYB+	WWB+	XWB+	YWB+	ZWB+	BZB+	CZB+	DZB+	FZB+	NAC+	OAC , family="binomial",data=x, na.action=na.omit)
+#fit8=fit8+fit9
+fit6<-  glm(x$testV ~	WM+	XM+	MRB+	POB+	ZM+	AN+	BN + NN + QN + WN + QO +BQ +EQ+ BRB + JQ + NQ + KQ + SMB + TMB+ KRB + YQB + ZQB + HYB + NYB +WWB+ XWB + ZWB + OAC, family="binomial",data=x, na.action=na.omit)
+
+#fit10<-  glm(x$testV ~   MZB+	RIC+	SIC+	TIC+	PAC+	QAC+	WAC+	RAC+	SAC+	TAC+	UAC+	VAC+	XAC+	YAC+	ABC+	BBC+	CBC+	DBC+	EBC+	FBC+	GBC ,data=x, na.action=na.omit)
+#fit11<-  glm(x$testV ~   	HBC+	IBC+	JBC+	KBC+	LBC+	GDC+	ZBC+	ACC+	BCC+	CCC+	DCC+	UBC+	VBC+	WBC+	XBC+	YBC+	SHC+	THC ,data=x, na.action=na.omit)
+#fit10=fit10+fit11
+fit7<-  glm(x$testV ~ MZB+	RIC+	SIC+	TIC+	PAC+XAC+CBC+HBC + LBC + SHC + THC, family="binomial",data=x, na.action=na.omit)
+
+
+fit<-  glm(x$testV ~   	HBC+	IBC+	JBC+	KBC+	LBC+	GDC+	ZBC+	ACC+	BCC+	CCC+	DCC+	UBC+	VBC+	WBC+	XBC+	YBC+	SHC+	THC ,data=x, na.action=na.omit)
+fit<-  glm(x$testV ~ HBC + LBC + SHC + THC, family="binomial",data=x, na.action=na.omit)
+
+# anova(fit10,test="Chisq")
+# summary(fit10)
+
+
+t1<-anova(fit1, test="Chisq")
+t2<-anova(fit2, test="Chisq")
+t3<-anova(fit3, test="Chisq")
+t4<-anova(fit4, test="Chisq")
+t5<-anova(fit5, test="Chisq")
+t6<-anova(fit6, test="Chisq")
+t7<-anova(fit7, test="Chisq")
+
+
+#rm(t1,t2,t3,t4,t5,t6,t7,fit1,fit2,fit3,fit4,fit5,fit6,fit7)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Recategorising variables ##
+x <- tidyx
+
+
+quantile(na.omit(x$FM),c(0.25,0.5,0.75))
+
+
+
+# x$FM[ is.na(x$FM) ] <- 1000
+# x$FM<-exp(-x$FM)
+#x$FM<-addNA(x$FM)
+
+x$FM<-cut(x$FM, c(-5,150,600,2000,20000 ))
+x$FM<-addNA(x$FM)
+#x$FM<-exp(x$FM)
+
+
+dts = split_df(x, y="testV",ratio=0.6)
+x = dts$train
+y = dts$test
+
+
+fit <- glm(testV ~ FM , family=binomial(link="logit"), data=x, na.action=na.omit)
+fit6 <- glm(testV6 ~ FM  , family=binomial(link="logit"), data=x, na.action=na.omit)
+
+fity <- glm(testV ~ FM , family=binomial(link="logit"), data=y, na.action=na.omit)
+fit6y<- glm(testV6 ~ FM  , family=binomial(link="logit"), data=y, na.action=na.omit)
+
+y["predicted"]<-NA
+y$predicted<-predict(fit, y, type="response")
+y["predicted6"]<-NA
+y$predicted6<-predict(fit6, y, type="response")
+
+
+# summary(fit)
+# summary(fity)
+#anova(fit,test="Chisq")
+#y$predicted<-predict(fit, y, type="fitted")
+
+plotROC(y$testV,y$predicted)
+z<-data.frame(fit$coefficients,fity$coefficients , fit6$coefficients,fit6y$coefficients )
+rm(fit,fit6,fit6y,fity)
+
+z
+2*AUROC(y$testV,y$predicted)-1
+2*AUROC(y$testV6,y$predicted6)-1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Testing fOIC policies ##
+x <- tidyx
+
+#AVE<-nrow(x[x$testV==1,] )/ 100000
+
+nrow(x[!is.na(x$OIC) & x$OIC >= 0 & x$testV==1,])/nrow(x[!is.na(x$OIC) & x$OIC>=0,])
+nrow(x[is.na(x$OIC) & x$testV==1,])/nrow(x[is.na(x$OIC) ,])
+
+
+x$OIC[is.na(x$OIC)]<- -1
+boxplot(x$OIC,ylim=c(0,20))
+#nrow(x[is.na(x$OIC),])
+
+
+max(na.omit(x$OIC))
+
+
+### Numeric ###
+pcBAD<-vector(mode="double",length=80)
+
+for (j in 1:72) {
+  pcBAD[j+2] <- nrow(x[x$OIC >= j  & !is.na(x$OIC) & x$testV6 ==1, ])/nrow(x[x$OIC >= j & !is.na(x$OIC) , ]) 
+}
+
+pcBAD[1]<-nrow(x[is.na(x$OIC) & x$testV==1,])/nrow(x[is.na(x$OIC) ]) 
+pcBAD[2]<-nrow(x[x$OIC == 0  & !is.na(x$OIC) & x$testV6 ==1, ])/nrow(x[x$OIC == 0  & !is.na(x$OIC) , ]) 
+
+plot(x=c(-2:(length(pcBAD)-3)),pcBAD,xlim=c(-1,10),type="l", xlab="",  ylab="Bad rate (%)")
+writeClipboard(as.character(pcBAD))
+pcBAD
+
+
+# Class ##
+# pcBAD<-vector(mode="double",length=10)
+# x$OIC<-as.character(x$OIC)
+# x$OIC[x$OIC=="ND"]<-NA
+# x$OIC[x$OIC=="D"]<-7
+# x$OIC[x$OIC=="U"]<-0.5
+# x$OIC[x$OIC=="?"]<-NA
+# 
+# x$OIC<-as.numeric(x$OIC)
+# 
+# pcBAD[1] <- nrow(x[x$OIC==0 & x$testV ==1, ])/nrow(x[x$OIC==0 , ])- AVE
+# pcBAD[2] <- nrow(x[x$OIC >= 0.5 & x$testV == 1, ])/nrow(x[x$OIC >= 0.5  , ])- AVE
+# pcBAD[3] <- nrow(x[is.na(x$OIC) & x$testV ==1, ])/nrow(x[is.na(x$OIC) , ])- AVE
+# pcBAD[4] <- nrow(x[x$OIC>= 1 & x$testV == 1, ])/nrow(x[x$OIC>= 1 , ])- AVE
+# pcBAD[5] <- nrow(x[x$OIC>= 2 & x$testV == 1, ])/nrow(x[x$OIC>= 2 , ])- AVE
+# pcBAD[6] <- nrow(x[x$OIC>= 3 & x$testV == 1, ])/nrow(x[x$OIC>= 3 , ])- AVE
+# pcBAD[7] <- nrow(x[x$OIC>= 4 & x$testV == 1, ])/nrow(x[x$OIC>= 4 , ])- AVE
+# pcBAD[8] <- nrow(x[x$OIC>= 5 & x$testV == 1, ])/nrow(x[x$OIC>= 5 , ])- AVE
+# pcBAD[9] <- nrow(x[x$OIC>= 6 & x$testV == 1, ])/nrow(x[x$OIC>= 6 , ])- AVE
+# pcBAD[10] <- nrow(x[x$OIC>= 7 & x$testV == 1, ])/nrow(x[x$OIC>= 7  , ])- AVE
+# 
+# 
+# plot(pcBAD,type="l", ylab="Deviation from overall bad rate (%)" , xlab="OIC: WOICst current payment status, excluding utilities")
+# writeClipboard(as.character(pcBAD))
+# pcBAD
+
+
+
+
+
+
+
