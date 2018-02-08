@@ -1,0 +1,97 @@
+
+#### Tidy working set -  Gini loop below ####
+
+x<-tidyx[1:100000,]
+
+x$tjc<-NULL
+x$xkc<-NULL
+# 
+# x$HYB<-NULL
+# x$RYB<-NULL
+x$ICB<-NULL
+# x$NJC<-NULL
+# x$HRB<-NULL
+# x$SYB<-NULL
+x$FWB<-NULL
+x$KCB<-NULL
+
+
+### Change NAs ###
+# x<-lapply(x,function(y) {if (is.factor(y)==TRUE) {addNA(y)}else{y<-y} })
+
+x<-data.frame(x)
+
+x<-x[,sapply(x,isUnique)]
+x<-data.frame(x)
+
+
+# x<-mutate_if(x,is.numeric, funs(replace(., is.na(.), -1)))
+# x<-mutate_if(x,is.integer, funs(replace(., is.na(.), -1)))
+
+temp<-x
+
+##split dataframe ##
+x2<-x
+x6<-x
+x2$testV6<-NULL
+x6$testV<-NULL
+
+dts2 <- split_df(x2, y="testV",ratio=0.6)
+dts6 <- split_df(x6, y="testV6",ratio=0.6)
+
+x2<-data.frame(dts2$train)
+y2<-data.frame(dts2$test)
+x6<-data.frame(dts6$train)
+y6<-data.frame(dts6$test)
+
+# bins2<-woebin(x2,y="testV")
+# bins6<-woebin(x6,y="testV6")
+
+x2<-woebin_ply(x2, bins2, print_step=0)  ##train_woe
+y2<-woebin_ply(y2, bins2, print_step=0)  ##test_woe
+x6<-woebin_ply(x6, bins6, print_step=0)
+y6<-woebin_ply(y6, bins6, print_step=0)
+
+
+Gin2<-vector(mode="double",length=length(x[1,])-1)
+Gin6<-vector(mode="double",length=length(x[1,])-1)
+
+
+varList<-sapply(x2[,1:length(x2[1,])],names)
+varList6<-sapply(x6[,1:length(x6[1,])],names)
+
+
+for(i in 1:(length(x[1,])-2) )   {
+  # for ( i in 1:150) {
+  t<-NA 
+  t1<-NA
+  temp<-NA
+  temp1<-NA
+  fit<-NA
+  fit1<-NA
+  
+  
+  Formula <- formula(paste("testV ~ ",  (names(varList[i]))))
+  Formula2 <- formula(paste("testV6 ~ ",  (names(varList6[i]))))
+  
+  fit <- glm(Formula ,  family=binomial(link="logit"), data=x2, na.action=na.omit)
+  fit1 <- glm( Formula2 , family=binomial(link="logit"), data=x6, na.action=na.omit) 
+  
+  
+  t<-predict(fit, y2, type="response")
+  t1<-predict(fit1, y6, type="response")
+  
+  temp<-data.frame(y2$testV,t)
+  temp1<-data.frame(y6$testV6,t1)
+  
+  Gin2[i] <- 2*AUROC(temp$y2.testV,temp$t)-1      
+  Gin6[i] <- 2*AUROC( temp1$y6.testV6, temp1$t1)-1  
+  
+  print(i)
+}
+
+z<-colnames(x[1,1:(length(x[1,])-1)]) # create vector of variable names
+VariableComp2<-data.frame(z,Gin2,Gin6) 
+rm(Gin2,Gin6,varList,fit,fit1,z,t,t1,temp,temp1,x2,x6,y2,y6,Formula,Formula2,dts2,dts6)
+
+write.csv(VariableComp2,file="GiniScores2_wNA.csv")
