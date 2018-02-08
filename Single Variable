@@ -1,0 +1,58 @@
+x <- tidyx
+# rm(dts)
+# dts = split_df(x, y="testV",ratio=0.6)
+# tidyx<-x
+
+x<-data.frame(x)
+## Recategorising variables ##
+
+
+quantile(na.omit(x$TMB),c(0.25,0.5,0.75))
+
+x <- data.frame(dts$train)
+y <- data.frame(dts$test)
+
+#bins<-woebin(x,y="testV")
+
+# x$TMB[ is.na(x$TMB) ] <- -1
+# y$TMB[is.na(y$TMB)]<-  -1
+# x$TMB<-exp(-x$TMB)
+# x$TMB<-addNA(x$TMB)
+
+bins[[c("TMB","bin")]]
+ x$TMB<-cut(x$TMB, c( -Inf,1,3,26 ,Inf ), right=FALSE)
+ y$TMB<-cut(y$TMB, c( -Inf,1,3,26 ,Inf  ) , right=FALSE)
+ 
+ # levels(x$TMB)<-c("0","1","3","3","3","3","3","D","ND","U",NA)
+ # levels(y$TMB)<-c("0","1","3","3","3","3","3","D","ND","U",NA)
+ 
+ x$TMB<-addNA(x$TMB)
+ y$TMB<-addNA(y$TMB)
+
+
+
+fit <- glm(testV ~ TMB , family=binomial(link="logit"), data=x, na.action=na.omit)
+fit6 <- glm(testV6 ~ TMB  , family=binomial(link="logit"), data=x, na.action=na.omit)
+
+fity <- glm(testV ~ TMB , family=binomial(link="logit"), data=y, na.action=na.omit)
+fit6y<- glm(testV6 ~ TMB  , family=binomial(link="logit"), data=y, na.action=na.omit)
+
+
+y["predicted"]<-NA
+y$predicted<-predict(fit, y, type="response")
+y["predicted6"]<-NA
+y$predicted6<-predict(fit6, y, type="response")
+
+
+# summary(fit)
+# summary(fity)
+#anova(fit,test="Chisq")
+#y$predicted<-predict(fit, y, type="fitted")
+
+plotROC(y$testV,y$predicted)
+z<-data.frame(fit$coefficients,fity$coefficients , fit6$coefficients,fit6y$coefficients )
+rm(fit,fit6,fit6y,fity)
+
+z
+2*AUROC(y$testV,y$predicted)-1
+2*AUROC(y$testV6,y$predicted6)-1
