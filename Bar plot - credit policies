@@ -1,0 +1,111 @@
+##Class ##
+x<-tidyx
+
+pcBAD<-vector(mode="double",length=10)
+pcBAD6<-vector(mode="double",length=10)
+
+x$NG<-as.character(x$NG)
+x$NG[x$NG=="ND"]<-NA
+x$NG[x$NG=="D"]<-7
+x$NG[x$NG=="U"]<-0.5
+x$NG[x$NG=="?"]<-NA
+
+x$NG<-as.numeric(x$NG)
+
+##2+
+
+pcBAD[1] <- nrow(x[x$NG==0 & x$testV ==1, ])/nrow(x[x$NG==0 , ])
+pcBAD[2] <- nrow(x[x$NG == 0.5 & x$testV == 1, ])/nrow(x[x$NG == 0.5  , ])
+pcBAD[3] <- nrow(x[x$NG== 1 & x$testV == 1, ])/nrow(x[x$NG== 1 , ])
+pcBAD[4] <- nrow(x[x$NG== 2 & x$testV == 1, ])/nrow(x[x$NG== 2 , ])
+pcBAD[5] <- nrow(x[x$NG== 3 & x$testV == 1, ])/nrow(x[x$NG== 3 , ])
+pcBAD[6] <- nrow(x[x$NG== 4 & x$testV == 1, ])/nrow(x[x$NG== 4 , ])
+pcBAD[7] <- nrow(x[x$NG== 5 & x$testV == 1, ])/nrow(x[x$NG== 5 , ])
+pcBAD[8] <- nrow(x[x$NG== 6 & x$testV == 1, ])/nrow(x[x$NG== 6 , ])
+pcBAD[9] <- nrow(x[x$NG== 7 & x$testV == 1, ])/nrow(x[x$NG== 7  , ])
+pcBAD[10] <- nrow(x[is.na(x$NG) & x$testV ==1, ])/nrow(x[is.na(x$NG) , ])
+
+
+##6+
+pcBAD6[1] <- nrow(x[x$NG==0 & x$testV6 ==1, ])/nrow(x[x$NG==0 , ])
+pcBAD6[2] <- nrow(x[x$NG == 0.5 & x$testV6 == 1, ])/nrow(x[x$NG == 0.5  , ])
+pcBAD6[3] <- nrow(x[x$NG== 1 & x$testV6 == 1, ])/nrow(x[x$NG== 1 , ])
+pcBAD6[4] <- nrow(x[x$NG== 2 & x$testV6 == 1, ])/nrow(x[x$NG== 2 , ])
+pcBAD6[5] <- nrow(x[x$NG== 3 & x$testV6 == 1, ])/nrow(x[x$NG== 3 , ])
+pcBAD6[6] <- nrow(x[x$NG== 4 & x$testV6 == 1, ])/nrow(x[x$NG== 4 , ])
+pcBAD6[7] <- nrow(x[x$NG== 5 & x$testV6 == 1, ])/nrow(x[x$NG== 5 , ])
+pcBAD6[8] <- nrow(x[x$NG== 6 & x$testV6 == 1, ])/nrow(x[x$NG== 6 , ])
+pcBAD6[9] <- nrow(x[x$NG== 7 & x$testV6 == 1, ])/nrow(x[x$NG== 7  , ])
+pcBAD6[10] <- nrow(x[is.na(x$NG) & x$testV6 ==1, ])/nrow(x[is.na(x$NG) , ])
+
+
+barplot(pcBAD, main="NG - 2+", xpd=FALSE, horiz=FALSE, ylim=c(0.3,0.6),ylab=" Bad rate (%)",xlab="Status",names.arg=c("0", "U", "1", "2", "3", "4", "5", "6", "D", "NA"))
+barplot(pcBAD6, main="NG - 6+ ", xpd=FALSE, horiz=FALSE, ylim=c(0.3,0.6), ylab=" Bad rate (%)",xlab="Status",names.arg=c("0", "U",  "1", "2", "3", "4", "5", "6", "D", "NA"))
+
+
+#writeClipboard(as.character(pcBAD))
+pcBAD
+par(mfrow=c(2,1))
+
+
+
+
+
+
+########### BAR PLOT 2 ################
+
+# 
+# ##Class ##
+# x<-tidyx
+# 
+# pcBAD<-vector(mode="double",length=7)
+# pcBAD6<-vector(mode="double",length=7)
+# 
+# x$DB<-as.character(x$DB)
+# x$DB[x$DB=="ND"]<-NA
+# x$DB[x$DB=="D"]<-7
+# x$DB[x$DB=="U"]<-0.5
+# x$DB[x$DB=="?"]<-NA
+# 
+# x$DB<-as.numeric(x$DB)
+# 
+# ##2+
+# 
+# pcBAD[1] <- nrow(x[x$DB==0 & x$testV ==1, ])/nrow(x[x$DB==0 , ])
+# # pcBAD[2] <- nrow(x[x$DB == 0.5 & x$testV == 1, ])/nrow(x[x$DB == 0.5  , ])
+# pcBAD[2] <- nrow(x[x$DB== 1 & x$testV == 1, ])/nrow(x[x$DB== 1 , ])
+# pcBAD[3] <- nrow(x[x$DB== 2 & x$testV == 1, ])/nrow(x[x$DB== 2 , ])
+# pcBAD[4] <- nrow(x[x$DB== 3 & x$testV == 1, ])/nrow(x[x$DB== 3 , ])
+# pcBAD[5] <- nrow(x[x$DB== 4 & x$testV == 1, ])/nrow(x[x$DB== 4 , ])
+# pcBAD[6] <- nrow(x[x$DB== 5 & x$testV == 1, ])/nrow(x[x$DB== 5 , ])
+# pcBAD[7] <- nrow(x[x$DB== 6 & x$testV == 1, ])/nrow(x[x$DB== 6 , ])
+# # pcBAD[9] <- nrow(x[x$DB== 7 & x$testV == 1, ])/nrow(x[x$DB== 7  , ])
+# # pcBAD[10] <- nrow(x[is.na(x$DB) & x$testV ==1, ])/nrow(x[is.na(x$DB) , ])
+# 
+# 
+# ##6+
+# pcBAD6[1] <- nrow(x[x$DB==0 & x$testV6 ==1, ])/nrow(x[x$DB==0 , ])
+# # pcBAD6[2] <- nrow(x[x$DB == 0.5 & x$testV6 == 1, ])/nrow(x[x$DB == 0.5  , ])
+# pcBAD6[2] <- nrow(x[x$DB== 1 & x$testV6 == 1, ])/nrow(x[x$DB== 1 , ])
+# pcBAD6[3] <- nrow(x[x$DB== 2 & x$testV6 == 1, ])/nrow(x[x$DB== 2 , ])
+# pcBAD6[4] <- nrow(x[x$DB== 3 & x$testV6 == 1, ])/nrow(x[x$DB== 3 , ])
+# pcBAD6[5] <- nrow(x[x$DB== 4 & x$testV6 == 1, ])/nrow(x[x$DB== 4 , ])
+# pcBAD6[6] <- nrow(x[x$DB== 5 & x$testV6 == 1, ])/nrow(x[x$DB== 5 , ])
+# pcBAD6[7] <- nrow(x[x$DB== 6 & x$testV6 == 1, ])/nrow(x[x$DB== 6 , ])
+# # pcBAD6[9] <- nrow(x[x$DB== 7 & x$testV6 == 1, ])/nrow(x[x$DB== 7  , ])
+# # pcBAD6[10] <- nrow(x[is.na(x$DB) & x$testV6 ==1, ])/nrow(x[is.na(x$DB) , ])
+# 
+# 
+# # barplot(pcBAD, main="DB - 2+", xpd=FALSE, horiz=FALSE, ylim=c(0.3,0.6),ylab=" Bad rate (%)",xlab="Status",names.arg=c("0", "U", "1", "2", "3", "4", "5", "6", "D", "NA"))
+# # barplot(pcBAD6, main="DB - 6+ ", xpd=FALSE, horiz=FALSE, ylim=c(0.3,0.6), ylab=" Bad rate (%)",xlab="Status",names.arg=c("0", "U",  "1", "2", "3", "4", "5", "6", "D", "NA"))
+# 
+# 
+# barplot(pcBAD, main="DB - 2+", xpd=FALSE, horiz=FALSE, ylim=c(0.3,0.7),ylab=" Bad rate (%)",xlab="Status",names.arg=c("0", "1", "2", "3", "4", "5", "6"))
+# barplot(pcBAD6, main="DB - 6+ ", xpd=FALSE, horiz=FALSE, ylim=c(0.3,0.7), ylab=" Bad rate (%)",xlab="Status",names.arg=c("0",  "1", "2", "3", "4", "5", "6"))
+# 
+# 
+# 
+# #writeClipboard(as.character(pcBAD))
+# pcBAD
+# par(mfrow=c(2,1))
+
