@@ -1,0 +1,70 @@
+## Testing fOR policies ##
+#tidyx<-x
+x <- tidyx
+
+#AVE<-nrow(x[x$testV==1,] )/ 100000
+
+nrow(x[!is.na(x$HN) & x$HN >= 0 & x$testV==1,])/nrow(x[!is.na(x$HN) & x$HN>=0,])
+nrow(x[is.na(x$HN) & x$testV==1,])/nrow(x[is.na(x$HN) ,])
+
+
+# x$HN[is.na(x$HN)]<- -1
+# boxplot(x$HN,ylim=c(0,2000))
+#nrow(x[is.na(x$HN),])
+
+
+max(na.omit(x$HN))
+
+
+### Numeric ###
+pcBAD<-vector(mode="double",length=80)
+pcBAD6<-vector(mode="double",length=80)
+
+# for (j in 1:72) {
+#   pcBAD[j+2] <- nrow(x[x$HN == j  & !is.na(x$HN) & x$testV ==1, ])/nrow(x[x$HN == j & !is.na(x$HN) , ])
+#   pcBAD6[j+2] <- nrow(x[x$HN == j  & !is.na(x$HN) & x$testV6 ==1, ])/nrow(x[x$HN == j & !is.na(x$HN) , ])
+# }
+
+# if(nrow(x[is.na(x$HN) ,]) !=0 ){
+#   pcBAD[1]<-nrow(x[is.na(x$HN) & x$testV==1,])/nrow(x[is.na(x$HN) ,])
+#   pcBAD6[1]<-nrow(x[is.na(x$HN) & x$testV6==1,])/nrow(x[is.na(x$HN), ])
+# } else { pcBAD[1]<-NA
+#  pcBAD6[1]<-NA}
+# 
+# pcBAD[2]<-nrow(x[x$HN == 0  & !is.na(x$HN) & x$testV == 1, ])/nrow(x[x$HN == 0  & !is.na(x$HN) , ]) 
+# pcBAD6[2]<-nrow(x[x$HN == 0  & !is.na(x$HN) & x$testV6 == 1, ])/nrow(x[x$HN == 0  & !is.na(x$HN) , ]) 
+
+# plot(x=c(-1:(length(pcBAD)-2)),pcBAD,xlim=c(-1,50),ylim=c(0,0.8),type="l",main="HN - 2+" , xlab="",  ylab="Bad rate (%)")
+# plot(x=c(-1:(length(pcBAD6)-2)),pcBAD6,xlim=c(-1,50), ylim=c(0,0.8) ,type="l",main="HN - 6+" , xlab="",  ylab="Bad rate (%)")
+
+
+#writeClipboard(as.character(pcBAD))
+pcBAD
+
+par(mfrow=c(1,2))
+
+
+
+
+pcBAD<-vector(mode="double",length=80)
+pcBAD6<-vector(mode="double",length=80)
+
+
+# if(nrow(x[is.na(x$HN) ,]) !=0 ){
+#   pcBAD[1]<-nrow(x[is.na(x$HN) & x$testV==1,])/nrow(x[is.na(x$HN) ,])
+#   pcBAD6[1]<-nrow(x[is.na(x$HN) & x$testV6==1,])/nrow(x[is.na(x$HN), ])
+# } else { pcBAD[1]<-NA
+# pcBAD6[1]<-NA}
+
+
+for (j in seq(0,4000,50)) {
+  #j=j*50
+  pcBAD[(j/50)+1] <- nrow(x[x$HN >= j  & x$HN < j+50 &  !is.na(x$HN) & x$testV ==1, ])/nrow(x[x$HN >= j  & x$HN < j+50 & !is.na(x$HN) , ])
+  pcBAD6[(j/50)+1] <- nrow(x[x$HN >= j  & x$HN < j+50  & !is.na(x$HN) & x$testV6 ==1, ])/nrow(x[x$HN >= j  & x$HN < j+50 & !is.na(x$HN) , ])
+}
+
+plot(x=seq(0,4000,50),pcBAD,xlim=c(-1,1000),ylim=c(0.2,0.6),type="l",main="HN - 2+" , xlab="",  ylab="Bad rate (%)")
+plot(x=seq(0,4000,50),pcBAD6,xlim=c(-1,1000),ylim=c(0.2,0.6),type="l",main="HN - 6+" , xlab="",  ylab="Bad rate (%)")
+
+
+
