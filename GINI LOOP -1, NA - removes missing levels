@@ -1,0 +1,142 @@
+# tidyx<-x
+x<-tidyx
+#### Tidy working set -  Gini loop below ####
+
+x$tjc<-NULL
+x$xkc<-NULL
+# 
+
+
+
+
+### Change NDs to NAs ###
+convNA<-function(y){
+if (class(y)=="factor") { y<-as.character(y)
+  y[y=="ND"]<-NA
+  y[y=="?"]<-NA
+  y[y=="<NA>"]<-NA
+  y<-as.factor(y)
+  } else {y<-y} 
+} 
+x<-lapply(x,convNA)
+x<-data.frame(x)
+
+x<-lapply(x,function(y) {if (is.factor(y)==TRUE) {addNA(y)}else{y<-y} })
+x<-data.frame(x)
+
+x<-x[,sapply(x,isUnique)]
+x<-data.frame(x)
+
+
+## Months since NA treatment ##
+x$JYB[is.na(x$JYB)]<-99
+x$TR[is.na(x$TR)]<-99
+x$MJC[is.na(x$MJC)]<-99
+x$DCC[is.na(x$DCC)]<-99
+x$KYB[is.na(x$KYB)]<-99
+x$WN[is.na(x$WN)]<-99
+x$CCC[is.na(x$CCC)]<-99
+x$XN[is.na(x$XN)]<-99
+x$XS[is.na(x$XS)]<-99
+x$YN[is.na(x$YN)]<-99
+x$UT[is.na(x$UT)]<-99
+x$EJC[is.na(x$EJC)]<-99
+x$BCC[is.na(x$BCC)]<-99
+x$MIC[is.na(x$MIC)]<-99
+x$HH[is.na(x$HH)]<-99
+x$NAC[is.na(x$NAC)]<-99
+x$IJC[is.na(x$IJC)]<-99
+x$CAC[is.na(x$CAC)]<-999
+x$WD[is.na(x$WD)]<-99
+x$AE[is.na(x$AE)]<-99
+x$CE[is.na(x$CE)]<-99
+x$ND[is.na(x$ND)]<-99
+x$HZB[is.na(x$HZB)]<-99
+x$RD[is.na(x$RD)]<-999
+x$NE[is.na(x$NE)]<-999
+x$GH[is.na(x$GH)]<-999
+x$PWB[is.na(x$PWB)]<-99
+x$YD[is.na(x$YD)]<-99
+
+## Other variables NA set to -1 ## 
+x<-mutate_if(x,is.numeric, funs(replace(., is.na(.), -1)))
+x<-mutate_if(x,is.integer, funs(replace(., is.na(.), -1)))
+
+
+
+##split dataframe ##
+x2<-x
+x6<-x
+x2$testV6<-NULL
+x6$testV<-NULL
+
+dts2 <- split_df(x2, y="testV",ratio=0.6)
+dts6 <- split_df(x6, y="testV6",ratio=0.6)
+
+x2<-data.frame(dts2$train)
+y2<-data.frame(dts2$test)
+x6<-data.frame(dts6$train)
+y6<-data.frame(dts6$test)
+
+# bins2<-woebin(x2,y="testV")
+# bins6<-woebin(x6,y="testV6")
+# 
+# x2<-woebin_ply(x2, bins2, print_step=0)  ##train_woe
+# y2<-woebin_ply(y2, bins2, print_step=0)  ##test_woe
+# x6<-woebin_ply(x6, bins6, print_step=0)
+# y6<-woebin_ply(y6, bins6, print_step=0)
+
+
+Gin2<-vector(mode="double",length=length(x[1,])-1)
+Gin6<-vector(mode="double",length=length(x[1,])-1)
+
+
+varList<-sapply(x2[,1:length(x2[1,])],names)
+varList6<-sapply(x6[,1:length(x6[1,])],names)
+
+
+for(i in 1:(length(x[1,])-2) )   {
+  # for ( i in 1:150) {
+  t<-NA 
+  t1<-NA
+  temp<-y2
+  temp1<-y6
+  fit<-NA
+  fit1<-NA
+  
+  unique(x2[,i])
+  unique(y2[,i])
+  
+  temp <- temp[temp[,i] %in% x2[,i],]   ### Here we remove instances of new factors appearing in test set
+  temp1 <- temp1[temp1[,i] %in% x6[,i],] 
+  
+  unique(temp[,i])
+  
+  Formula <- formula(paste("testV ~ ",  (names(varList[i]))))
+  Formula2 <- formula(paste("testV6 ~ ",  (names(varList6[i]))))
+  
+  fit <- glm(Formula ,  family=binomial(link="logit"), data=x2, na.action=na.omit)
+  fit1 <- glm( Formula2 , family=binomial(link="logit"), data=x6, na.action=na.omit) 
+  
+  t<-predict(fit, temp, type="response")
+  t1<-predict(fit1, temp1, type="response")
+  
+  
+  Gin2[i] <- 2*AUROC(temp$testV, t)-1      
+  Gin6[i] <- 2*AUROC(temp1$testV6, t1)-1  
+  
+  print(i)
+}
+
+z<-names(varList) # create vector of variable names
+VariableComp<-data.frame(z,Gin2) 
+z2 <- names(varList6)
+VariableComp2<-data.frame(z2,Gin6) 
+names(VariableComp2)[names(VariableComp2)=="z2"] <- "z"
+t<-merge(VariableComp,VariableComp2,by="z",all=TRUE)
+
+# rm(Gin2,Gin6,varList,fit,fit1,z,t1,temp,temp1,x2,x6,y2,y6,Formula,Formula2,dts2,dts6,VariableComp,VariableComp2)
+
+write.csv(t,file="GiniBin")
+write.csv(VariableComp2,file="GiniScores2_wNA.csv")
+
