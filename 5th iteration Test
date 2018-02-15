@@ -1,0 +1,94 @@
+# tidyx<-x
+x<-tidyx
+x$tjc<-NULL
+x$xkc<-NULL
+
+#### Tidy working set -  Gini loop below ####
+
+# rm(dts)
+# dts = split_df(x, y="testV",ratio=0.6)
+
+x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$WVB,x$SEB,x$QIC,x$QL)
+names(x)[names(x)=="x.testV"] <- "testV"
+names(x)[names(x)=="x.testV6"] <- "testV6"
+names(x)[names(x)=="x.QF"] <- "QF"
+names(x)[names(x)=="x.WVB"] <- "WVB"
+names(x)[names(x)=="x.IG"] <- "IG"
+names(x)[names(x)=="x.SEB"] <- "SEB"
+names(x)[names(x)=="x.QIC"] <- "QIC"
+names(x)[names(x)=="x.QL"] <- "QL"
+
+
+## Recategorising variables ##
+
+x$WVB[is.na(x$WVB)]<- -1
+
+x2<-x
+x6<-x
+x2$testV6<-NULL
+x6$testV<-NULL
+
+dts2 <- split_df(x2, y="testV",ratio=0.6)
+dts6 <- split_df(x6, y="testV6",ratio=0.6)
+
+
+x2<-data.frame(dts2$train)
+y2<-data.frame(dts2$test)
+x6<-data.frame(dts6$train)
+y6<-data.frame(dts6$test)
+
+QFx<-x2$QF
+QFy<-y2$QF
+WVBx<-x2$WVB
+WVBy<-y2$WVB
+
+# breaks_adj2 = breaks_adj6 = "list( SEB=c(1, 2, 3, 4))"
+# breaks_adj6 = "list( SEB=c(1, 2, 3,4,5))"
+# bins2<-woebin(x2,y="testV",breaks_list = breaks_adj2)
+# bins6<-woebin(x6,y="testV6",breaks_list = breaks_adj6)
+
+bins2<-woebin(x2,y="testV")
+bins6<-woebin(x6,y="testV6")
+
+x2<-woebin_ply(x2, bins2)  ##train_woe
+y2<-woebin_ply(y2, bins2)  ##test_woe
+x6<-woebin_ply(x6, bins6, print_step=0)
+y6<-woebin_ply(y6, bins6, print_step=0)
+
+x2$QF<-QFx
+y2$QF<-QFy
+x6$QF<-QFx
+y6$QF<-QFy
+x2$WVB<-WVBx
+y2$WVB<-WVBy
+
+bins2[[c("SEB","bin")]]
+bins6[[c("SEB","bin")]]
+
+
+fit <- glm(testV ~ QF * IG_woe * WVB * QIC_woe , family=binomial(link="logit"), data=x2, na.action=na.omit)
+fit6 <- glm(testV6 ~   QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe, family=binomial(link="logit"), data=x6, na.action=na.omit)
+
+fity <- glm(testV ~ QF * IG_woe * WVB * QIC_woe , family=binomial(link="logit"), data=y2, na.action=na.omit)
+fit6y<- glm(testV6 ~ QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe , family=binomial(link="logit"), data=y6, na.action=na.omit)
+
+
+predicted<-predict(fit, y2, type="response")
+predicted6<-predict(fit6, y6, type="response")
+
+
+summary(fit6)
+anova(fit6,test="Chisq")
+
+plotROC(y2$testV,predicted)
+z<-data.frame(fit$coefficients,fity$coefficients,fit$coefficients/fity$coefficients)
+z6<-data.frame(fit6$coefficients,fit6y$coefficients ,fit6$coefficients/fit6y$coefficients )
+z
+z6
+rm(fit,fit6,fit6y,fity)
+ 
+perf_eva(y6$testV6,predicted6, title = "train")
+
+cat("Gini 2+: ", 2*AUROC(y2$testV,predicted)-1,"\t\tGini 6+: ", 2*AUROC(y6$testV6,predicted6)-1, "\n")
+
+
