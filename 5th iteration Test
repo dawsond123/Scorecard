@@ -8,7 +8,7 @@ x$xkc<-NULL
 # rm(dts)
 # dts = split_df(x, y="testV",ratio=0.6)
 
-x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$WVB,x$SEB,x$QIC,x$QL)
+x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$WVB,x$SEB,x$QIC,x$QL,x$YUB,x$MHC,x$W)
 names(x)[names(x)=="x.testV"] <- "testV"
 names(x)[names(x)=="x.testV6"] <- "testV6"
 names(x)[names(x)=="x.QF"] <- "QF"
@@ -17,11 +17,16 @@ names(x)[names(x)=="x.IG"] <- "IG"
 names(x)[names(x)=="x.SEB"] <- "SEB"
 names(x)[names(x)=="x.QIC"] <- "QIC"
 names(x)[names(x)=="x.QL"] <- "QL"
+names(x)[names(x)=="x.YUB"] <- "YUB"
+names(x)[names(x)=="x.MHC"] <- "MHC"
+names(x)[names(x)=="x.W"] <- "W"
 
 
 ## Recategorising variables ##
 
 x$WVB[is.na(x$WVB)]<- -1
+x$MHC[is.na(x$MHC)]<- -1
+
 
 x2<-x
 x6<-x
@@ -37,12 +42,17 @@ y2<-data.frame(dts2$test)
 x6<-data.frame(dts6$train)
 y6<-data.frame(dts6$test)
 
+
 QFx<-x2$QF
 QFy<-y2$QF
 WVBx<-x2$WVB
 WVBy<-y2$WVB
+MHCx<-x2$MHC  #### delete!! 
+MHCy<-y2$MHC
+Wx<-x2$W
+Wy<-y2$W
 
-# breaks_adj2 = breaks_adj6 = "list( SEB=c(1, 2, 3, 4))"
+# breaks_adj2 = breaks_adj6 = list( DBC=c( "missing" , "0", "? U"  ))
 # breaks_adj6 = "list( SEB=c(1, 2, 3,4,5))"
 # bins2<-woebin(x2,y="testV",breaks_list = breaks_adj2)
 # bins6<-woebin(x6,y="testV6",breaks_list = breaks_adj6)
@@ -61,34 +71,44 @@ x6$QF<-QFx
 y6$QF<-QFy
 x2$WVB<-WVBx
 y2$WVB<-WVBy
+x6$WVB<-WVBx
+y6$WVB<-WVBy
+x2$MHC<-MHCx
+y2$MHC<-MHCy
+x2$W<-Wx
+y2$W<-Wy
 
-bins2[[c("SEB","bin")]]
+bins2[[c("QIC","bin")]]
 bins6[[c("SEB","bin")]]
 
+# y2 <- y2[y2$DBC %in% x2$DBC,]   ### Here we remove instances of new factors appearing in test set
 
-fit <- glm(testV ~ QF * IG_woe * WVB * QIC_woe , family=binomial(link="logit"), data=x2, na.action=na.omit)
-fit6 <- glm(testV6 ~   QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe, family=binomial(link="logit"), data=x6, na.action=na.omit)
 
-fity <- glm(testV ~ QF * IG_woe * WVB * QIC_woe , family=binomial(link="logit"), data=y2, na.action=na.omit)
-fit6y<- glm(testV6 ~ QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe , family=binomial(link="logit"), data=y6, na.action=na.omit)
+Formula <- formula(testV ~ QF + IG_woe + WVB + QIC_woe + MHC + MHC:IG_woe + W)
+Formula2 <- formula(testV6 ~ QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe + YUB_woe + YUB_woe:QL_woe +WVB )
+
+fit <- glm(Formula , family=binomial(link="logit"), data=x2, na.action=na.omit)
+fit6 <- glm(Formula2 , family=binomial(link="logit"), data=x6, na.action=na.omit)
+
+fity <- glm(Formula , family=binomial(link="logit"), data=y2, na.action=na.omit)
+fit6y<- glm(Formula2 , family=binomial(link="logit"), data=y6, na.action=na.omit)
 
 
 predicted<-predict(fit, y2, type="response")
 predicted6<-predict(fit6, y6, type="response")
 
-
+  
 summary(fit6)
 anova(fit6,test="Chisq")
 
-plotROC(y2$testV,predicted)
 z<-data.frame(fit$coefficients,fity$coefficients,fit$coefficients/fity$coefficients)
 z6<-data.frame(fit6$coefficients,fit6y$coefficients ,fit6$coefficients/fit6y$coefficients )
 z
 z6
 rm(fit,fit6,fit6y,fity)
- 
-perf_eva(y6$testV6,predicted6, title = "train")
-
 cat("Gini 2+: ", 2*AUROC(y2$testV,predicted)-1,"\t\tGini 6+: ", 2*AUROC(y6$testV6,predicted6)-1, "\n")
 
+# perf_eva(y6$testV6,predicted6, title = "train")
+
+cat("Gini 2+: ", 2*AUROC(y2$testV,predicted)-1,"\t\tGini 6+: ", 2*AUROC(y6$testV6,predicted6)-1, "\n")
 
