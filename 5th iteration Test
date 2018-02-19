@@ -8,7 +8,7 @@ x$xkc<-NULL
 # rm(dts)
 # dts = split_df(x, y="testV",ratio=0.6)
 
-x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$WVB,x$SEB,x$QIC,x$QL,x$YUB,x$MHC,x$W)
+x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$WVB,x$SEB,x$QIC,x$QL,x$YUB,x$MHC,x$EQ,x$XUB,x$AN,x$TEB     )
 names(x)[names(x)=="x.testV"] <- "testV"
 names(x)[names(x)=="x.testV6"] <- "testV6"
 names(x)[names(x)=="x.QF"] <- "QF"
@@ -19,13 +19,18 @@ names(x)[names(x)=="x.QIC"] <- "QIC"
 names(x)[names(x)=="x.QL"] <- "QL"
 names(x)[names(x)=="x.YUB"] <- "YUB"
 names(x)[names(x)=="x.MHC"] <- "MHC"
-names(x)[names(x)=="x.W"] <- "W"
+names(x)[names(x)=="x.EQ"] <- "EQ"
+names(x)[names(x)=="x.XUB"] <- "XUB"
+names(x)[names(x)=="x.AN"] <- "AN"
+names(x)[names(x)=="x.TEB"] <- "TEB"
+
 
 
 ## Recategorising variables ##
 
 x$WVB[is.na(x$WVB)]<- -1
 x$MHC[is.na(x$MHC)]<- -1
+x$EQ<-ConvToNum(x$EQ)
 
 
 x2<-x
@@ -47,14 +52,28 @@ QFx<-x2$QF
 QFy<-y2$QF
 WVBx<-x2$WVB
 WVBy<-y2$WVB
-MHCx<-x2$MHC  #### delete!! 
+MHCx<-x2$MHC 
 MHCy<-y2$MHC
-Wx<-x2$W
-Wy<-y2$W
+EQx<-x2$EQ
+EQy<-y2$EQ
 
-# breaks_adj2 = breaks_adj6 = list( DBC=c( "missing" , "0", "? U"  ))
+
+# breaks_adj2<-woebin_adj(bins2,x2, y="testV", )
+ # breaks_adj2 = list(
+ #   QF=c("540", "560", "610", "655"),
+ #   IG=c("1", "2", "4"),
+ #   WVB=c(30, 120, 210),
+ #   SEB=c("1", "2", "3"),
+ #   QIC=c("1", "2"),
+ #   QL=c("1", "2", "3"),
+ #   YUB=c("20", "80", "140", "250"),
+ #   MHC=c(1, 2, 3),
+ #   EQ=c(0.5, 1, 2),
+ #   XUB=c("20","60", "100", "140"),
+ #   AN=c("105", "215")
+ # )
 # breaks_adj6 = "list( SEB=c(1, 2, 3,4,5))"
-# bins2<-woebin(x2,y="testV",breaks_list = breaks_adj2)
+ # bins2<-woebin(x2,y="testV",breaks_list = breaks_adj2)
 # bins6<-woebin(x6,y="testV6",breaks_list = breaks_adj6)
 
 bins2<-woebin(x2,y="testV")
@@ -75,17 +94,16 @@ x6$WVB<-WVBx
 y6$WVB<-WVBy
 x2$MHC<-MHCx
 y2$MHC<-MHCy
-x2$W<-Wx
-y2$W<-Wy
+x2$EQ<-EQx
+y2$EQ<-EQy
 
-bins2[[c("QIC","bin")]]
-bins6[[c("SEB","bin")]]
+bins2[[c("XUB","bin")]]
+bins6[[c("AN","bin")]]
 
 # y2 <- y2[y2$DBC %in% x2$DBC,]   ### Here we remove instances of new factors appearing in test set
 
-
-Formula <- formula(testV ~ QF + IG_woe + WVB + QIC_woe + MHC + MHC:IG_woe + W)
-Formula2 <- formula(testV6 ~ QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe + YUB_woe + YUB_woe:QL_woe +WVB )
+Formula <- formula(testV ~ QF + IG_woe + WVB + QIC_woe + MHC + MHC:IG_woe + I(exp(EQ))  + XUB_woe + TEB_woe )
+Formula2 <- formula(testV6 ~ QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe + YUB_woe + YUB_woe:QL_woe + WVB + AN_woe )
 
 fit <- glm(Formula , family=binomial(link="logit"), data=x2, na.action=na.omit)
 fit6 <- glm(Formula2 , family=binomial(link="logit"), data=x6, na.action=na.omit)
@@ -95,7 +113,10 @@ fit6y<- glm(Formula2 , family=binomial(link="logit"), data=y6, na.action=na.omit
 
 
 predicted<-predict(fit, y2, type="response")
+predictedB<-predict(fit, x2, type="response")
+
 predicted6<-predict(fit6, y6, type="response")
+predicted6B<-predict(fit6, x6, type="response")
 
   
 summary(fit6)
@@ -106,9 +127,13 @@ z6<-data.frame(fit6$coefficients,fit6y$coefficients ,fit6$coefficients/fit6y$coe
 z
 z6
 rm(fit,fit6,fit6y,fity)
-cat("Gini 2+: ", 2*AUROC(y2$testV,predicted)-1,"\t\tGini 6+: ", 2*AUROC(y6$testV6,predicted6)-1, "\n")
 
 # perf_eva(y6$testV6,predicted6, title = "train")
 
-cat("Gini 2+: ", 2*AUROC(y2$testV,predicted)-1,"\t\tGini 6+: ", 2*AUROC(y6$testV6,predicted6)-1, "\n")
+cat("Gini 2+: ", 2*AUROC(y2$testV,predicted)-1,"\t\tGini 2+ B: ", 2*AUROC(x2$testV,predictedB)-1, "\n")
+cat("Gini 6+: ", 2*AUROC(y6$testV6,predicted6)-1,"\t\tGini 6+ B: ", 2*AUROC(x6$testV6,predicted6B)-1, "\n")
+
+
+
+
 
