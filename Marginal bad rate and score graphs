@@ -1,0 +1,47 @@
+k<-data.frame(predicted,y2$testV,predicted6,y6$testV6)
+
+prob_2plus_given_accepted<-vector(mode="double",length=100)
+prob_6plus_given_accepted<-vector(mode="double",length=100)
+Total_accepted<-vector(mode="double",length=100)
+Total_accepted6<-vector(mode="double",length=100)
+
+for( i in 1:100) {
+
+k2<-ifelse( k$predicted > i/100 , 1, 0 )
+k6<-ifelse( k$predicted6 > i/100 , 1, 0 )
+
+prob_2plus_given_accepted[i]<- nrow( k[k$y2.testV==1  &  k2==0,] )/nrow(k[k2==0,])
+prob_6plus_given_accepted[i]<-nrow( k[k$y6.testV6==1  & k6==0,] )/nrow(k[k6==0,])
+Total_accepted[i] <- nrow( k[k2==0,])/nrow(k)
+Total_accepted6[i] <- nrow( k[k6==0,])/nrow(k)
+}
+par(mfrow=c(2,1))
+plot(x=seq(0.01,1,0.01),prob_2plus_given_accepted,main="2+", ylab= "Percent 2+ that we have accepted", xlab= "Probability below which we accept")
+plot(x=seq(0.01,1,0.01),prob_6plus_given_accepted,main="6+", ylab= "Percent 6+ that we have accepted", xlab= "Probability below which we accept")
+
+plot(x=seq(0.01,1,0.01),Total_accepted6,main="6+", ylab= "Percent accepted", xlab= "Probability below which we accept")
+plot(x=seq(0.01,1,0.01),Total_accepted,main="2+", ylab= "Percent accepted", xlab= "Probability below which we accept")
+
+prob_2plus_given_accepted
+
+
+
+k<-data.frame(predicted,y2$testV,predicted6,y6$testV6)
+
+
+k6<-ifelse( k$predicted > 0.2 , 1, 0 )
+nrow( k[k$y6.testV6==1  & k6==0,] )/nrow(k[k6==0,])
+nrow( k[k6 == 0,])/nrow(k)
+
+
+
+### Score Ply ###
+PDO <- 120  ## an X score increase corresponds to double odds of default
+XtoONE <- 100  ## Set chance of default - X:1
+iScore <- 1000  ## At a score of 500 we have an X:1 chance of defualt
+Fac<-PDO/log(2)
+offset<- iScore - Fac*log(XtoONE)
+Score <- offset + Fac*log(1/k$predicted6)
+
+plot(Score,predicted6, ylab= "Bad rate %" )
+
