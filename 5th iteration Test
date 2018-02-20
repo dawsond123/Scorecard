@@ -8,39 +8,50 @@ x$xkc<-NULL
 # rm(dts)
 # dts = split_df(x, y="testV",ratio=0.6)
 
-x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$WVB,x$SEB,x$QIC,x$QL,x$YUB,x$MHC,x$EQ,x$XUB,x$AN,x$TEB     )
+x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$EI,x$HG ,x$TEB,x$SVB,x$YUB  )
 names(x)[names(x)=="x.testV"] <- "testV"
 names(x)[names(x)=="x.testV6"] <- "testV6"
 names(x)[names(x)=="x.QF"] <- "QF"
-names(x)[names(x)=="x.WVB"] <- "WVB"
+names(x)[names(x)=="x.EI"] <- "EI"
 names(x)[names(x)=="x.IG"] <- "IG"
-names(x)[names(x)=="x.SEB"] <- "SEB"
-names(x)[names(x)=="x.QIC"] <- "QIC"
-names(x)[names(x)=="x.QL"] <- "QL"
+names(x)[names(x)=="x.HG"] <- "HG"
+names(x)[names(x)=="x.SVB"] <- "SVB"
+# names(x)[names(x)=="x.QL"] <- "QL"
 names(x)[names(x)=="x.YUB"] <- "YUB"
-names(x)[names(x)=="x.MHC"] <- "MHC"
-names(x)[names(x)=="x.EQ"] <- "EQ"
-names(x)[names(x)=="x.XUB"] <- "XUB"
-names(x)[names(x)=="x.AN"] <- "AN"
+# names(x)[names(x)=="x.MHC"] <- "MHC"
+# names(x)[names(x)=="x.EQ"] <- "EQ"
+# names(x)[names(x)=="x.XUB"] <- "XUB"
+# names(x)[names(x)=="x.AN"] <- "AN"
 names(x)[names(x)=="x.TEB"] <- "TEB"
 
 
 
+
+ConvToNum <- function(x) {
+   x<-as.character(x)
+   x[x=="NA"]<-0.75
+   x[is.na(x)]<-0.75
+   x[x=="ND"]<-0.75
+   x[x=="D"]<-7
+   x[x=="U"]<-0.25
+   x<-as.numeric(x)
+}
+
 ## Recategorising variables ##
 
-x$WVB[is.na(x$WVB)]<- -1
-x$MHC[is.na(x$MHC)]<- -1
-x$EQ<-ConvToNum(x$EQ)
+x$EI[is.na(x$EI)]<- -1
+x$SVB[is.na(x$SVB)]<- -1
+# x$EQ<-ConvToNum(x$EQ)
 
+# x<-within(x, EI[HG==0] <-NA)
 
 x2<-x
 x6<-x
 x2$testV6<-NULL
 x6$testV<-NULL
 
-dts2 <- split_df(x2, y="testV",ratio=0.6)
-dts6 <- split_df(x6, y="testV6",ratio=0.6)
-
+# dts2 <- split_df(x2, y="testV",ratio=0.6)
+# dts6 <- split_df(x6, y="testV6",ratio=0.6)
 
 x2<-data.frame(dts2$train)
 y2<-data.frame(dts2$test)
@@ -50,15 +61,26 @@ y6<-data.frame(dts6$test)
 
 QFx<-x2$QF
 QFy<-y2$QF
-WVBx<-x2$WVB
-WVBy<-y2$WVB
-MHCx<-x2$MHC 
-MHCy<-y2$MHC
-EQx<-x2$EQ
-EQy<-y2$EQ
+QFx6<-x6$QF
+QFy6<-y6$QF
+EIx<-x2$EI
+EIy<-y2$EI
+EIx6<-x6$EI
+EIy6<-y6$EI
+TEBx<-x2$TEB
+TEBy<-y2$TEB
+# EQx<-x2$EQ
+# EQy<-y2$EQ
+SVBx<-x2$SVB
+SVBy<-y2$SVB
+SVBx6<-x6$SVB
+SVBy6<-y6$SVB
+
+bins2<-woebin(x2,y="testV")
+bins6<-woebin(x6,y="testV6")
 
 
-# breaks_adj2<-woebin_adj(bins2,x2, y="testV", )
+# breaks_adj2<-woebin_adj(bins2,x2, y="testV","EI" )
  # breaks_adj2 = list(
  #   QF=c("540", "560", "610", "655"),
  #   IG=c("1", "2", "4"),
@@ -76,8 +98,6 @@ EQy<-y2$EQ
  # bins2<-woebin(x2,y="testV",breaks_list = breaks_adj2)
 # bins6<-woebin(x6,y="testV6",breaks_list = breaks_adj6)
 
-bins2<-woebin(x2,y="testV")
-bins6<-woebin(x6,y="testV6")
 
 x2<-woebin_ply(x2, bins2)  ##train_woe
 y2<-woebin_ply(y2, bins2)  ##test_woe
@@ -86,24 +106,28 @@ y6<-woebin_ply(y6, bins6, print_step=0)
 
 x2$QF<-QFx
 y2$QF<-QFy
-x6$QF<-QFx
-y6$QF<-QFy
-x2$WVB<-WVBx
-y2$WVB<-WVBy
-x6$WVB<-WVBx
-y6$WVB<-WVBy
-x2$MHC<-MHCx
-y2$MHC<-MHCy
-x2$EQ<-EQx
-y2$EQ<-EQy
+x6$QF<-QFx6
+y6$QF<-QFy6
+x2$EI<-EIx
+y2$EI<-EIy
+x6$EI<-EIx6
+y6$EI<-EIy6
+x2$SVB<-SVBx
+y2$SVB<-SVBy
+x6$SVB<-SVBx6
+y6$SVB<-SVBy6
+x6$TEB<-TEBx
+y6$TEB<-TEBy
+# x2$EQ<-EQx
+# y2$EQ<-EQy
 
-bins2[[c("XUB","bin")]]
-bins6[[c("AN","bin")]]
+# bins2[[c("XUB","bin")]]
+# bins6[[c("EI","bin")]]
 
 # y2 <- y2[y2$DBC %in% x2$DBC,]   ### Here we remove instances of new factors appearing in test set
 
-Formula <- formula(testV ~ QF + IG_woe + WVB + QIC_woe + MHC + MHC:IG_woe + I(exp(EQ))  + XUB_woe + TEB_woe )
-Formula2 <- formula(testV6 ~ QF + IG_woe + SEB_woe + SEB_woe:QF + QL_woe  + QL_woe:IG_woe + QF:IG_woe:QL_woe + YUB_woe + YUB_woe:QL_woe + WVB + AN_woe )
+Formula <- formula(testV ~ QF  + IG_woe  )
+Formula2 <- formula(testV6 ~ QF + EI  )
 
 fit <- glm(Formula , family=binomial(link="logit"), data=x2, na.action=na.omit)
 fit6 <- glm(Formula2 , family=binomial(link="logit"), data=x6, na.action=na.omit)
@@ -119,14 +143,13 @@ predicted6<-predict(fit6, y6, type="response")
 predicted6B<-predict(fit6, x6, type="response")
 
   
-summary(fit6)
-anova(fit6,test="Chisq")
+summary(fit)
+anova(fit,test="Chisq")
 
 z<-data.frame(fit$coefficients,fity$coefficients,fit$coefficients/fity$coefficients)
 z6<-data.frame(fit6$coefficients,fit6y$coefficients ,fit6$coefficients/fit6y$coefficients )
 z
 z6
-rm(fit,fit6,fit6y,fity)
 
 # perf_eva(y6$testV6,predicted6, title = "train")
 
