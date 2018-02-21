@@ -8,22 +8,26 @@ x$xkc<-NULL
 # rm(dts)
 # dts = split_df(x, y="testV",ratio=0.6)
 
-x<-data.frame(x$testV,x$testV6,x$QF,x$IG,x$EI,x$HG ,x$TEB,x$SVB,x$YUB  )
+# x$AYB[x$AYB==0]<-0.00000000001
+x$CYB<-x$BYB/x$AYB    ### manually calculate
+
+x<-data.frame(x$testV,x$testV6,x$QF,x$IG, x$SVB, x$TVB, x$TEB, x$QEB, x$CYB, x$QL, x$YUB )
 names(x)[names(x)=="x.testV"] <- "testV"
 names(x)[names(x)=="x.testV6"] <- "testV6"
 names(x)[names(x)=="x.QF"] <- "QF"
 names(x)[names(x)=="x.EI"] <- "EI"
 names(x)[names(x)=="x.IG"] <- "IG"
 names(x)[names(x)=="x.HG"] <- "HG"
+names(x)[names(x)=="x.TVB"] <- "TVB"
 names(x)[names(x)=="x.SVB"] <- "SVB"
-# names(x)[names(x)=="x.QL"] <- "QL"
+names(x)[names(x)=="x.CYB"] <- "CYB"
 names(x)[names(x)=="x.YUB"] <- "YUB"
-# names(x)[names(x)=="x.MHC"] <- "MHC"
 # names(x)[names(x)=="x.EQ"] <- "EQ"
 # names(x)[names(x)=="x.XUB"] <- "XUB"
 # names(x)[names(x)=="x.AN"] <- "AN"
 names(x)[names(x)=="x.TEB"] <- "TEB"
-
+names(x)[names(x)=="x.QEB"] <- "QEB"
+names(x)[names(x)=="x.QL"] <- "QL"
 
 
 
@@ -39,19 +43,24 @@ ConvToNum <- function(x) {
 
 ## Recategorising variables ##
 
-x$EI[is.na(x$EI)]<- -1
-x$SVB[is.na(x$SVB)]<- -1
+x$IG[is.na(x$IG)]<- -1
+# x$CYB[is.na(x$CYB)]<-5
+
 # x$EQ<-ConvToNum(x$EQ)
 
-# x<-within(x, EI[HG==0] <-NA)
+# x<-within(x, IG[HG==0] <-NA)
+# x$IG<-x$IG / x$HG
 
 x2<-x
 x6<-x
 x2$testV6<-NULL
 x6$testV<-NULL
 
-# dts2 <- split_df(x2, y="testV",ratio=0.6)
-# dts6 <- split_df(x6, y="testV6",ratio=0.6)
+x2$SVB[is.na(x2$SVB)]<- -1
+x6$SVB[is.na(x6$SVB)]<- -500
+
+dts2 <- split_df(x2, y="testV",ratio=0.6)
+dts6 <- split_df(x6, y="testV6",ratio=0.6)
 
 x2<-data.frame(dts2$train)
 y2<-data.frame(dts2$test)
@@ -63,18 +72,31 @@ QFx<-x2$QF
 QFy<-y2$QF
 QFx6<-x6$QF
 QFy6<-y6$QF
-EIx<-x2$EI
-EIy<-y2$EI
-EIx6<-x6$EI
-EIy6<-y6$EI
-TEBx<-x2$TEB
-TEBy<-y2$TEB
-# EQx<-x2$EQ
-# EQy<-y2$EQ
+# EIx<-x2$EI
+# EIy<-y2$EI
+# EIx6<-x6$EI
+# EIy6<-y6$EI
+IGx<-x2$IG
+IGy<-y2$IG
+IGx6<-x6$IG
+IGy6<-y6$IG
 SVBx<-x2$SVB
 SVBy<-y2$SVB
 SVBx6<-x6$SVB
 SVBy6<-y6$SVB
+TEBx<-x2$QEB
+TEBy<-y2$QEB
+TEBx6<-x6$QEB
+TEBy6<-y6$QEB
+CYBx<-x2$CYB
+CYBy<-y2$CYB
+CYBx6<-x6$CYB
+CYBy6<-y6$CYB
+QLx<-x2$QL
+QLy<-y2$QL
+QLx6<-x6$QL
+QLy6<-y6$QL
+
 
 bins2<-woebin(x2,y="testV")
 bins6<-woebin(x6,y="testV6")
@@ -108,26 +130,39 @@ x2$QF<-QFx
 y2$QF<-QFy
 x6$QF<-QFx6
 y6$QF<-QFy6
-x2$EI<-EIx
-y2$EI<-EIy
-x6$EI<-EIx6
-y6$EI<-EIy6
+# x2$EI<-EIx
+# y2$EI<-EIy
+# x6$EI<-EIx6
+# y6$EI<-EIy6
+x2$IG<-IGx
+y2$IG<-IGy
+x6$IG<-IGx6
+y6$IG<-IGy6
 x2$SVB<-SVBx
 y2$SVB<-SVBy
 x6$SVB<-SVBx6
 y6$SVB<-SVBy6
-x6$TEB<-TEBx
-y6$TEB<-TEBy
-# x2$EQ<-EQx
-# y2$EQ<-EQy
+x2$TEB<-TEBx
+y2$TEB<-TEBy
+x6$TEB<-TEBx6
+y6$TEB<-TEBy6
+x2$CYB<-CYBx
+y2$CYB<-CYBy
+x6$CYB<-CYBx6
+y6$CYB<-CYBy6
+x2$QL<-QLx
+y2$QL<-QLy
+x6$QL<-QLx6
+y6$QL<-QLy6
+
 
 # bins2[[c("XUB","bin")]]
 # bins6[[c("EI","bin")]]
 
 # y2 <- y2[y2$DBC %in% x2$DBC,]   ### Here we remove instances of new factors appearing in test set
 
-Formula <- formula(testV ~ QF  + IG_woe  )
-Formula2 <- formula(testV6 ~ QF + EI  )
+Formula <- formula(testV ~ QF + IG_woe + TVB_woe + TEB_woe + CYB_woe + CYB_woe:TEB_woe + SVB  )
+Formula2 <- formula(testV6 ~ QF + IG_woe + SVB + QEB_woe  + QL + QL:QF +YUB_woe )
 
 fit <- glm(Formula , family=binomial(link="logit"), data=x2, na.action=na.omit)
 fit6 <- glm(Formula2 , family=binomial(link="logit"), data=x6, na.action=na.omit)
@@ -143,8 +178,8 @@ predicted6<-predict(fit6, y6, type="response")
 predicted6B<-predict(fit6, x6, type="response")
 
   
-summary(fit)
-anova(fit,test="Chisq")
+summary(fit6)
+anova(fit6,test="Chisq")
 
 z<-data.frame(fit$coefficients,fity$coefficients,fit$coefficients/fity$coefficients)
 z6<-data.frame(fit6$coefficients,fit6y$coefficients ,fit6$coefficients/fit6y$coefficients )
