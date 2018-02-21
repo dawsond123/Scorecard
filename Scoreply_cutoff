@@ -1,0 +1,70 @@
+k<-data.frame(predicted,y2$testV,predicted6,y6$testV6)
+
+prob_2plus_given_accepted<-vector(mode="double",length=100)
+prob_6plus_given_accepted<-vector(mode="double",length=100)
+Total_accepted<-vector(mode="double",length=100)
+Total_accepted6<-vector(mode="double",length=100)
+
+for( i in 1:100) {
+
+k2<-ifelse( k$predicted > i/100 , 1, 0 )
+k6<-ifelse( k$predicted6 > i/100 , 1, 0 )
+
+prob_2plus_given_accepted[i]<- nrow( k[k$y2.testV==1  &  k2==0,] )/nrow(k[k2==0,])
+prob_6plus_given_accepted[i]<-nrow( k[k$y6.testV6==1  & k6==0,] )/nrow(k[k6==0,])
+Total_accepted[i] <- nrow( k[k2==0,])/nrow(k)
+Total_accepted6[i] <- nrow( k[k6==0,])/nrow(k)
+}
+par(mfrow=c(2,1))
+plot(x=seq(0.01,1,0.01),prob_2plus_given_accepted,main="2+", ylab= "Percent 2+ that we have accepted", xlab= "Probability below which we accept")
+plot(x=seq(0.01,1,0.01),prob_6plus_given_accepted,main="6+", ylab= "Percent 6+ that we have accepted", xlab= "Probability below which we accept")
+
+plot(x=seq(0.01,1,0.01),Total_accepted6,main="6+", ylab= "Percent accepted", xlab= "Probability below which we accept")
+plot(x=seq(0.01,1,0.01),Total_accepted,main="2+", ylab= "Percent accepted", xlab= "Probability below which we accept")
+
+prob_2plus_given_accepted
+
+
+
+k<-data.frame(predicted,y2$testV,predicted6,y6$testV6)
+
+
+
+
+fit <- glm( testV ~ QF + IG_woe + TVB_woe + TEB_woe + CYB_woe + CYB_woe:TEB_woe , family=binomial(link="logit"), data=x2, na.action=na.omit)
+predictedx<-predict(fit, y2, type="response")
+
+fit6 <- glm( testV6 ~  QF + IG_woe + SVB + QEB_woe  + QL + QL:QF , family=binomial(link="logit"), data=x6, na.action=na.omit)
+predicted6x<-predict(fit6, y6, type="response")
+
+k1<-data.frame(y6$testV6,predicted6x,y2$testV,predictedx)
+
+k6<-ifelse( k1$predicted6x < 0.28 , 1 , 0 ) ## k6 is vector of accepted1/rejected0
+cat("% accepted: ",nrow( k1[k6 == 1,])/(90593*0.4),"\t\t % of accepted who went 6+: ",  nrow( k1[k1$y6.testV6==1 & k6==1,] )/nrow(k1[k6==1,]))
+
+k2<-ifelse( k1$predictedx < 0.4 , 1 , 0 )
+cat("% accepted: ",nrow( k1[k2 == 1,])/(90593*0.4),"\t\t % of accepted who went 2+: ",  nrow( k1[k1$y2.testV==1  & k2==1,] )/nrow(k1[k2==1,]))
+
+
+
+
+ perf_eva(k1$y6.testV6,k6, title = "train")
+
+
+### Score Ply ###
+PDO <- 120  ## an X score increase corresponds to double odds of default
+XtoONE <- 100  ## Set chance of default - X:1
+iScore <- 1000  ## At a score of 500 we have an X:1 chance of defualt
+Fac<-PDO/log(2)
+offset<- iScore - Fac*log(XtoONE)
+Score <- offset + Fac*log(1/k1$predicted6x)
+
+plot(Score,predicted6, ylab= "Bad rate %" )
+
+
+
+
+
+
+
+
