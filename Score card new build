@@ -1,0 +1,121 @@
+x<-data_2_6_untouched
+x$X.1<-NULL
+
+
+
+# remove performance data, start date, type of account and id number
+x[, 563:(length(x[1,])-2)]<-NULL
+x[, 1:3] <-NULL
+
+x[x=="ND"] <- NA
+x[x=="<NA>"] <- NA
+
+
+#Columns with only one unique value are removed
+isUnique<-function(x){
+  length(unique(x))!=1   
+}
+x<-x[,sapply(x,isUnique)]
+
+
+# numerics stored as characters are converted
+x$PDB<-as.factor(x$PDB)     # over 25 unique but with "XXX >> stored as factor
+x$BTB<-as.factor(x$BTB)
+x$HCB<-as.factor(x$HCB)
+ConvToNum <- function(x) {
+  if (class(x) == "character"  && length(unique(x)) > 25 && !is.na(length(unique(x)))) {
+    x[x=="NA"]<-NA
+    x[x=="ND"]<-NA
+    x<-as.numeric(x)
+  } else { x <- x }
+}
+x<-suppressWarnings(lapply(x,ConvToNum))
+x<-data.frame(x)
+
+# ## Credit policies ## 
+x<-x[ x$VR==0 | is.na(x$VR),]   #No accounts defaulted in the last 12 months. 					[VR]
+
+x<-x[ x$NE > 12 | is.na(x$NE),]  #No CCJs in the last 36m							[NE]
+# 
+x$XR<-as.character(x$XR)
+x<-x[ x$XR == "N" | is.na(x$XR) | x$XR == "ND" | x$XR == "U",]  #Only accepted holder status of Normal or ND 					[XR]
+x$XR<-as.factor(x$XR)
+
+x$HRB<-as.character(x$HRB)
+x<-x[ x$HRB == "0" | is.na(x$HRB) | x$HRB == "ND" | x$HRB == "U"| x$HRB == "?",]  #Cannot have a worst current status on all accounts of 1 or more			[HRB]
+x$HRB<-as.factor(x$HRB)
+
+x<-x[ x$MZB < 100 | is.na(x$MZB),]   #Less than 3 credit searches in the past 3 months				[QEB]
+
+# tidyx<-x
+x<-tidyx
+x$tjc<-NULL
+x$xkc<-NULL
+x$testV<-NULL
+
+xFilt<-var_filter(x, y="testV6", iv_limit = 0.04, na_perc_limit = 0.90)
+
+dt_list = split_df(xFilt, y="testV6", ratio = 0.6, seed = 30)
+train = dt_list$train; test = dt_list$test;
+
+bins = woebin(xFilt, y="testV6", print_step = 1)
+bins_germ_df = data.table::rbindlist(bins)
+ 
+t<-aggregate(bins_germ_df,by=list(bins_germ_df$variable,bins_germ_df$total_iv), mean )
+t<-data.frame(t$Group.1,t$total_iv)
+t<-t[order(t$t.total_iv,decreasing=TRUE),]
+t<-t[1:20,]
+t<-as.character(t$t.Group.1)
+xFilt<-subset(xFilt,select=t)
+xFilt$testV6<-x$testV6
+
+bins = woebin(xFilt, y="testV6", print_step = 1)
+
+# # converting train and test into woe values
+train_woe = woebin_ply(train, bins, print_step=0)
+test_woe = woebin_ply(test, bins, print_step=0)
+
+# glm ------
+m1 = glm( testV6 ~ ., family = "binomial", data = train_woe)
+ 
+m_step = step(m1, direction="both", trace = TRUE, steps=100)
+m2 = eval(m_step$call)
+
+train_pred = predict(m2, train_woe, type='response')
+test_pred = predict(m2, test_woe, type='response')
+
+train_perf = perf_eva(train$testV6, train_pred, title = "train")
+test_perf = perf_eva(test$testV6, test_pred, title = "test")
+
+
+
+# six<-vector(mode="double",length=2000)
+# two<-vector(mode="double",length=2000)
+# # a<-x2$SVB
+# # b<-y2$SVB
+# # c<-x6$SVB
+# # d<-y6$SVB
+# for( i in 0:100){
+#   x2$SVB<-a
+#   y2$SVB<-b
+#   x6$SVB<-c
+#   y6$SVB<-d
+#   x2$SVB[x2$SVB== 50000]<- -60 + i/10
+#   y2$SVB[y2$SVB== 50000]<- -60 + i/10
+#   x6$SVB[x6$SVB== 50000]<- -150 + i/10
+#   y6$SVB[y6$SVB== 50000]<- -150 + i/10
+#   
+#   fit <- glm( testV ~ QF + IG_woe + TVB_woe + TEB_woe + CYB_woe + CYB_woe:TEB_woe + SVB + TMB_woe + YZB , family=binomial(link="logit"), data=x2, na.action=na.omit)
+#   predicted<-predict(fit, y2, type="response")
+#   
+#   fit6 <- glm( testV6 ~ QF + IG_woe + SVB + QEB_woe  + QL + QL:QF + YUB_woe + DAB_woe + GF_woe + GRB_woe + GRB_woe:SVB , family=binomial(link="logit"), data=x6, na.action=na.omit)
+#   predicted6<-predict(fit6, y6, type="response")
+#   
+#   six[i]<-2*AUROC(y6$testV6,predicted6)-1
+#   two[i]<-2*AUROC(y2$testV,predicted)-1
+#   cat(-60 + i/10, "\t\t",  2*AUROC(y2$testV,predicted)-1 ,"\t\t" , "\n")
+# }
+# par(mfrow=c(2,1))
+# plot(six,main="6+",type="l",xlim=c(0,95),ylim=c(0.3456,0.3457))
+# plot(two,main="2+",type="l",xlim=c(0,95),ylim=c(0.328,0.33))
+# 
