@@ -1,0 +1,117 @@
+# tidyx<-x
+
+x<-tidyx
+
+x$tjc<-NULL
+x$xkc<-NULL
+x$testV<-NULL
+
+xFilt<-var_filter(x, y="testV6", iv_limit = 0.04, na_perc_limit = 0.90)
+dt_list = split_df(xFilt, y="testV6", ratio = 0.6, seed = 30)
+trainCont = dt_list$train; testCont = dt_list$test;
+
+bins = woebin(xFilt, y="testV6", print_step = 1)
+bins_germ_df = data.table::rbindlist(bins)
+
+xFilt<-temp
+t<-aggregate(bins_germ_df,by=list(bins_germ_df$variable,bins_germ_df$total_iv), mean )
+t<-data.frame(t$Group.1,t$total_iv)
+t<-t[order(t$t.total_iv,decreasing=TRUE),]
+# t<-t[1:20,]
+t<-as.character(t$t.Group.1)
+xFilt<-subset(xFilt,select=t)
+xFilt$testV6<-x$testV6
+
+train = dt_list$train; test = dt_list$test;
+
+bins = woebin(xFilt, y="testV6", print_step = 1)
+
+# # converting train and test into woe values
+train_woe = woebin_ply(train, bins, print_step=0)
+test_woe = woebin_ply(test, bins, print_step=0)
+
+
+## Retreating variables ##
+trainCont<-mutate_if(trainCont,is.numeric, funs(replace(., is.na(.), -1)))
+trainCont<-mutate_if(trainCont,is.integer, funs(replace(., is.na(.), -1)))
+testCont<-mutate_if(testCont,is.numeric, funs(replace(., is.na(.), -1)))
+testCont<-mutate_if(testCont,is.integer, funs(replace(., is.na(.), -1)))
+
+train_woe$QF<-trainCont$QF
+test_woe$QF<-testCont$QF
+train_woe$HN<-trainCont$HN
+test_woe$HN<-testCont$HN
+train_woe$BYB<-trainCont$BYB
+test_woe$BYB<-testCont$BYB
+train_woe$YZB<-trainCont$YZB
+test_woe$YZB<-testCont$YZB
+train_woe$YZB[train_woe$YZB==-1]<- -48
+test_woe$YZB[test_woe$YZB==-1]<- -48
+train_woe$YUB<-trainCont$YUB
+test_woe$YUB<-testCont$YUB
+train_woe$FI<-trainCont$FI
+test_woe$FI<-testCont$FI
+train_woe$TEB<-trainCont$TEB
+test_woe$TEB<-testCont$TEB
+
+# train_woe$EBC<-addNA(train_woe$EBC)
+# test_woe$EBC<-addNA(test_woe$EBC)
+# glm ------
+# Formula <- formula(testV6 ~ HG_woe  + QL_woe + EI_woe + BYB_woe + QF + AYB_woe + HN_woe + IG_woe  +HG_woe:BYB_woe:QF_woe )+ QEB_woe:YZB + QF:IG_woe
+Formula <- formula(testV6 ~ QF + QL_woe + BYB  + HN_woe+ IG_woe + SVB_woe + QEB_woe + YZB + YUB_woe + YUB_woe:SVB_woe + QL_woe:QF + QEB_woe:YZB + QF:IG_woe + FI  +TEB_woe  )
+# Formula <- formula(testV6 ~ (QF + QL_woe + BYB  +  HN_woe + IG_woe + SVB_woe + QEB_woe + YZB + YUB_woe)^2 )
+
+m1 = glm( Formula , family = "binomial", data = train_woe, na.action=na.omit)
+
+# m_step = step(m1, direction="both", trace = TRUE, steps=100)
+# m2 = eval(m_step$call)
+
+m1y = glm( Formula , family = "binomial", data = test_woe, na.action=na.omit)
+
+
+z<-data.frame(m1$coefficients,m1y$coefficients, m1$coefficients/m1y$coefficients-1 )
+
+
+train_pred <- predict(m1y, train_woe, type='response')
+test_pred <- predict(m1, test_woe, type='response')
+
+# train_perf = perf_eva(train$testV6, train_pred, title = "train")
+# test_perf = perf_eva(test$testV6, test_pred, title = "test")
+
+summary(m1)
+anova(m1,test="Chisq")
+z
+cat("Gini 6+: ", 2*AUROC(test_woe$testV6,test_pred)-1,"\t\tGini prev: ", GinPrev,"\t\t Gini/Giniprev:   ", (2*AUROC(test_woe$testV6,test_pred)-1)/GinPrev, "\n")
+cat("AIC: ", m1$aic,"\t\tAIC prev.: ", AICprev, "\t\tAIC/AICprev:  ", m1$aic/AICprev, "\n"  )
+AICprev<-m1$aic; GinPrev<-2*AUROC(test_woe$testV6,test_pred)-1
+
+
+
+Fbins = woebin(x, y="testV6", print_step = 1)
+xWoe = woebin_ply(x, Fbins, print_step=0)
+
+xCont<-mutate_if(x,is.numeric, funs(replace(., is.na(.), -1)))
+xCont<-mutate_if(x,is.integer, funs(replace(., is.na(.), -1)))
+
+xWoe$QF<-xCont$QF
+xWoe$HN<-xCont$HN
+xWoe$BYB<-xCont$BYB
+xWoe$YZB<-xCont$YZB
+xWoe$YZB[xWoe$YZB==-1]<- -48
+xWoe$YUB<-xCont$YUB
+# glm ------
+# Formula <- formula(testV6 ~ HG_woe  + QL_woe + EI_woe + BYB_woe + QF + AYB_woe + HN_woe + IG_woe  +HG_woe:BYB_woe:QF_woe )
+Formula <- formula(testV6 ~ QF + QL_woe + BYB  + HN_woe+ IG_woe + SVB_woe + QEB_woe + YZB + YUB_woe + YUB_woe:SVB_woe + QL_woe:QF + QEB_woe:YZB + QF:IG_woe)
+
+m1 = glm( Formula , family = "binomial", data = xWoe)
+
+predictedx<-predict(m1, xWoe, type='response')
+
+k1<-data.frame(xWoe$testV6,predictedx)
+
+k6<-ifelse( k1$predictedx < 0.1922 , 1 , 0 ) ## k6 is vector of accepted1/rejected0
+cat("% accepted: ",nrow( k1[k6 == 1,])/nrow(k1),"\t\t % of accepted who went 6+: ",  nrow( k1[k1$xWoe.testV6==1 & k6==1,] )/nrow(k1[k6==1,]))
+
+
+
+
