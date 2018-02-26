@@ -1,17 +1,21 @@
-# tidyx<-x
 x<-tidyx
 x$tjc<-NULL
 x$xkc<-NULL
+
+#### Tidy working set -  Gini loop below ####
+
+# rm(dts)
+# dts = split_df(x, y="testV",ratio=0.6)
 
 # x$AYB[x$AYB==0]<-0.00000000001
 x$CYB<-x$BYB/x$AYB    ### manually calculate
 
 
-x<-data.frame(x$testV,x$testV6,x$DAB,x$TMB,x$QF,x$IG, x$SVB, x$TVB, x$TEB, x$QEB, x$CYB, x$QL, x$YUB)
+x<-data.frame(x$testV,x$testV6,x$UEB , x$GRB, x$W,x$GF, x$YZB, x$DAB,x$TMB,x$QF,x$IG, x$SVB, x$TVB, x$TEB, x$QEB, x$CYB, x$QL, x$YUB,x$OIC)
 names(x)[names(x)=="x.testV"] <- "testV"
 names(x)[names(x)=="x.testV6"] <- "testV6"
 names(x)[names(x)=="x.QF"] <- "QF"
-names(x)[names(x)=="x.EI"] <- "EI"
+names(x)[names(x)=="x.W"] <- "W"
 names(x)[names(x)=="x.IG"] <- "IG"
 names(x)[names(x)=="x.HG"] <- "HG"
 names(x)[names(x)=="x.TVB"] <- "TVB"
@@ -20,17 +24,34 @@ names(x)[names(x)=="x.CYB"] <- "CYB"
 names(x)[names(x)=="x.YUB"] <- "YUB"
 names(x)[names(x)=="x.TMB"] <- "TMB"
 names(x)[names(x)=="x.DAB"] <- "DAB"
-# names(x)[names(x)=="x.AN"] <- "AN"
 names(x)[names(x)=="x.TEB"] <- "TEB"
 names(x)[names(x)=="x.QEB"] <- "QEB"
 names(x)[names(x)=="x.QL"] <- "QL"
+names(x)[names(x)=="x.YZB"] <- "YZB"
+names(x)[names(x)=="x.GF"] <- "GF"
+names(x)[names(x)=="x.GRB"] <- "GRB"
+names(x)[names(x)=="x.OIC"] <- "OIC"
+names(x)[names(x)=="x.UEB"] <- "UEB"
 
+# cor(x,use="pairwise.complete.obs")
 
+ConvToNum <- function(x) {
+  x<-as.character(x)
+  x[x=="NA"]<-0.75
+  x[is.na(x)]<-0.75
+  x[x=="ND"]<-0.75
+  x[x=="?"]<-0.75
+  x[x=="D"]<-7
+  x[x=="U"]<-0.25
+  x<-as.numeric(x)
+}
 
 ## Recategorising variables ##
 
 x$IG[is.na(x$IG)]<- -1
 x$TMB[is.na(x$TMB)]<- 0
+x$YZB[is.na(x$YZB)]<- -48
+x$GF[is.na(x$GF)] <- 100
 
 
 x2<-x
@@ -38,7 +59,7 @@ x6<-x
 x2$testV6<-NULL
 x6$testV<-NULL
 
-x2$SVB[is.na(x2$SVB)]<- -1
+x2$SVB[is.na(x2$SVB)]<- -150
 x6$SVB[is.na(x6$SVB)]<- -500
 
 
@@ -58,10 +79,19 @@ TMBx<-x2$TMB
 TMBx6<-x6$TMB
 DABx<-x2$DAB
 DABx6<-x6$DAB
+YZBx<-x2$YZB
+YZBx6<-x6$YZB
+Wx<-x2$W
+Wx6<-x6$W
+GRBx<-x2$GRB
+GRBx6<-x6$GRB
+OICx<-x2$OIC
+OICx6<-x6$OIC
+UEBx<-x2$UEB
+UEBx6<-x6$UEB
 
-
-# bins2<-woebin(x2,y="testV")
-# bins6<-woebin(x6,y="testV6")
+ bins2<-suppressWarnings(woebin(x2,y="testV"))
+ bins6<-suppressWarnings(woebin(x6,y="testV6"))
 
 
 x2<-woebin_ply(x2, bins2)  ##train_woe
@@ -84,37 +114,62 @@ x2$TMB<-TMBx
 x6$TMB<-TMBx6
 x2$DAB<-DABx
 x6$DAB<-DABx6
+x2$YZB<-YZBx
+x6$YZB<-YZBx6
+x2$GRB<-GRBx
+x6$GRB<-GRBx6
+x2$OIC<-OICx
+x6$OIC<-OICx6
+x2$UEB<-UEBx
+x6$UEB<-UEBx6
 
-
-
-fit <- glm( testV ~ QF + IG_woe + TVB_woe + TEB_woe + CYB_woe + CYB_woe:TEB_woe + SVB + TMB_woe , family=binomial(link="logit"), data=x2, na.action=na.omit)
+fit <- glm( testV ~  QF + IG_woe + TVB_woe + TEB_woe + CYB_woe + SVB + TMB_woe + YZB + W_woe+ OIC + I(OIC/TEB_woe) + OIC:TMB_woe  , family=binomial(link="logit"), data=x2, na.action=na.omit)
 predictedx<-predict(fit, x2, type="response")
 
-fit6 <- glm( testV6 ~  QF + IG_woe + SVB + QEB_woe  + QL + QL:QF + YUB_woe + DAB_woe  , family=binomial(link="logit"), data=x6, na.action=na.omit)
+fit6 <- glm( testV6 ~ QF + IG_woe + SVB + QEB_woe  + QL + QL:QF + YUB_woe + DAB_woe + GF_woe + GRB_woe + GRB_woe:SVB + UEB + I(UEB/QEB_woe) + UEB:QL  , family=binomial(link="logit"), data=x6, na.action=na.omit)
 predicted6x<-predict(fit6, x6, type="response")
 
 k1<-data.frame(x6$testV6,predicted6x,x2$testV,predictedx)
 
-k6<-ifelse( k1$predicted6x < 0.282 , 1 , 0 ) ## k6 is vector of accepted1/rejected0
+k6<-ifelse( k1$predicted6x < 0.27985 , 1 , 0 ) ## k6 is vector of accepted1/rejected0
 cat("% accepted: ",nrow( k1[k6 == 1,])/(90593),"\t\t % of accepted who went 6+: ",  nrow( k1[k1$x6.testV6==1 & k6==1,] )/nrow(k1[k6==1,]))
 
-k2<-ifelse( k1$predictedx < 0.39575 , 1 , 0 )
+k2<-ifelse( k1$predictedx < 0.3956 , 1 , 0 )
 cat("% accepted: ",nrow( k1[k2 == 1,])/(90593),"\t\t % of accepted who went 2+: ",  nrow( k1[k1$x2.testV==1  & k2==1,] )/nrow(k1[k2==1,]))
 
 
+2*AUROC(x2$testV,predictedx)-1
+2*AUROC(x6$testV6,predicted6x)-1
 
-# perf_eva(k1$x6.testV6,predicted6x, title = "train")
+misClasificError6 <- mean(k6 == x6$testV6)
+print(paste('Accuracy',1-misClasificError))
+
+misClasificError <- mean(k2 == x$testV)
+print(paste('Accuracy',1-misClasificError))
+
+perf_eva(k1$x6.testV6,predicted6x, title = "6+")
+perf_eva(k1$x2.testV,predictedx, title = "2+")
 
 
 ### Score Ply ###
-# PDO <- 120  ## an X score increase corresponds to double odds of default
-# XtoONE <- 100  ## Set chance of default - X:1
-# iScore <- 1000  ## At a score of 500 we have an X:1 chance of defualt
-# Fac<-PDO/log(2)
-# offset<- iScore - Fac*log(XtoONE)
-# Score <- offset + Fac*log(1/k1$predicted6x)
-# 
-# plot(Score,predicted6x, ylab= "Bad rate %" )
+PDO <- 100  ## an X score increase corresponds to double odds of default
+XtoONE <- 1000  ## Set chance of default - X:1
+iScore <- 1000  ## At a score of iScore we have an X:1 chance of defualt
+Fac<-PDO/log(2)
+offset<- iScore - Fac*log(XtoONE)
+Score <- offset + Fac*log(1/k1$predicted6x)
 
+plot(Score,predicted6x, ylab= "Bad rate %", pch="." )
+l<-data.frame(Score, predicted6x ,k1$x6.testV6 )
 
+Bads<-vector(mode="double",length=1150)
+for(i in seq(0,1150,25)){
+  if(nrow(l[l$Score < i+25 & l$Score >= i, ]) == 0){Bads[i] <- NA
+  } else if (nrow(l[l$k1.x6.testV6==1 & l$Score < i+25 & l$Score >= i, ])==0 ){ Bads[i]<- NA 
+  }else {
+    Bads[i] <- nrow(l[l$k1.x6.testV6==1 & l$Score < i+25 & l$Score >= i, ])/nrow(l[l$Score < i+25 & l$Score >= i, ])
+}}
+Bads[Bads==0]<-NA
+par(new=T)
+plot(Bads,ylim=c(0,1),ylab="")
 
